@@ -1,0 +1,43 @@
+{
+  "name": "whimsy",
+  "description": "Generate parts of speech to add a touch of whimsy.",
+  "version": "1.0.0",
+  "main": "lib/whimsy.js",
+  "scripts": {
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tandrewnichols/whimsy.git"
+  },
+  "keywords": [
+    "generate",
+    "generator",
+    "random",
+    "words",
+    "speech",
+    "grammar",
+    "naming"
+  ],
+  "author": {
+    "name": "Andrew Nichols",
+    "email": "tandrewnichols@gmail.com",
+    "url": "www.tandrewnichols.me"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tandrewnichols/whimsy/issues"
+  },
+  "homepage": "https://github.com/tandrewnichols/whimsy",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-clean": "^0.3.1",
+    "gulp-jshint": "^1.11.2",
+    "gulp-mocha": "^2.1.3",
+    "gulp-open": "^1.0.0",
+    "jshint-stylish": "^2.0.1",
+    "mocha": "^2.3.3",
+    "should": "^7.1.0"
+  }
+}

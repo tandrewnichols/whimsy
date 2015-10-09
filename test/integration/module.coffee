@@ -59,13 +59,52 @@ describe 'whimsy required as a module', ->
       And -> @parts[1].should.be.oneOf @words.noun
       And -> @parts[0].should.not.eql @parts[1]
 
-    context 'with filters', ->
+    context 'nested property', ->
+
+    context 'with post filters', ->
+      afterEach -> _.random.restore()
+      Given -> sinon.stub(_, 'random').returns 0
+
       context 'pluralize', ->
-        afterEach -> _.random.restore()
-        Given -> sinon.stub(_, 'random').returns 0
         Then -> @subject('{{ noun | pluralize }}').should.eql 'fires'
       
       context 'capitalize', ->
-        afterEach -> _.random.restore()
-        Given -> sinon.stub(_, 'random').returns 0
         Then -> @subject('{{ noun | capitalize }}').should.eql 'Fire'
+
+      context 'past', ->
+        Then -> @subject('{{ verb | past }}').should.eql 'finagled'
+
+      context 'past particple', ->
+        Then -> @subject('{{ verb | past_participle }}').should.eql 'finagled'
+
+      context 'conjugate', ->
+        Then -> @subject('{{ verb | conjugate("he") }}').should.eql 'finagles'
+
+    context 'with pre filters', ->
+      afterEach -> _.random.restore()
+      Given -> sinon.stub(_, 'random').returns 0
+
+      context 'startsWith', ->
+        Then -> @subject('{{ noun : startsWith("a") }}').should.eql 'alley'
+
+      context 'endsWith', ->
+        Then -> @subject('{{ noun : endsWith("t") }}').should.eql 'sheet'
+
+      context 'contains', ->
+        Then -> @subject('{{ noun : contains("u") }}').should.eql 'biscuit'
+
+      context 'matching', ->
+
+      context 'greaterThan', ->
+        
+      context 'lessThan', ->
+
+      context 'saveAs', ->
+
+    context 'with both pre and post filters', ->
+      afterEach -> _.random.restore()
+      Given -> sinon.stub(_, 'random').returns 0
+      Then -> @subject('{{ noun : startsWith("s") | capitalize }}').should.eql 'Sheet'
+
+    context 'called with a count', ->
+      Then -> @subject('{{ noun }}', 5).length.should.eql 5

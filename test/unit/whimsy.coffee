@@ -20,6 +20,11 @@ describe 'whimsy', ->
       Given -> @subject.interpolate.onSecondCall().returns 'apple'
       Then -> @subject('{{ noun }} and {{ noun }}').should.eql 'banana and apple'
 
+    context 'with a count', ->
+      Given -> @subject.interpolate.onFirstCall().returns 'foo'
+      Given -> @subject.interpolate.onSecondCall().returns 'bar'
+      Then -> @subject('{{ noun }}', 2).should.eql ['foo', 'bar']
+
   describe '.interpolate', ->
     afterEach -> @subject.makeFilters.restore()
     afterEach -> @subject.generate.restore()
@@ -35,13 +40,8 @@ describe 'whimsy', ->
       , '|').returns 'post filters'
       Given -> @subject.makeFilters.withArgs(
         match: 'banana'
-        postFilters: 'post filters'
       , ':').returns 'pre filters'
-      Given -> @subject.applyFilters.withArgs('yellow',
-        match: 'banana'
-        postFilters: 'post filters'
-        preFilters: 'pre filters'
-      ).returns 'done'
+      Given -> @subject.applyFilters.withArgs('yellow', 'post filters').returns 'done'
       Then -> @subject.interpolate('{{ banana }}', 'banana').should.eql 'done'
 
     context 'with filters', ->
@@ -51,43 +51,59 @@ describe 'whimsy', ->
       , '|').returns 'post filters'
       Given -> @subject.makeFilters.withArgs(
         match: 'banana : peel | eat'
-        postFilters: 'post filters'
       , ':').returns 'pre filters'
-      Given -> @subject.applyFilters.withArgs('yellow',
-        match: 'banana : peel | eat'
-        postFilters: 'post filters'
-        preFilters: 'pre filters'
-      ).returns 'done'
+      Given -> @subject.applyFilters.withArgs('yellow', 'post filters').returns 'done'
       Then -> @subject.interpolate('{{ banana | pluralize }}', 'banana : peel | eat ').should.eql 'done'
 
-  describe '.standardizeFilter', ->
+  describe '.parse', ->
     afterEach -> delete @filters.foo
     Given -> @filters.foo = ->
 
     context 'no parens', ->
-      Then -> @subject.standardizeFilter('foo').should.eql 'return filters.foo(word)'
+      Then -> @subject.parse('foo').should.eql
+        name: 'foo'
+        params: []
 
     context 'parens already there', ->
-      Then -> @subject.standardizeFilter('foo()').should.eql 'return filters.foo()'
+      Then -> @subject.parse('foo()').should.eql
+        name: 'foo'
+        params: []
+
+    context 'parens with a parameter', ->
+      Then -> @subject.parse('foo("bar")').should.eql
+        name: 'foo'
+        params: ['bar']
 
     context 'function is not a filter', ->
-      Then -> @subject.standardizeFilter('bar()').should.eql 'return filters.noop()'
+      Then -> @subject.parse('bar()').should.eql
+        name: 'noop'
+        params: []
 
   describe '.makeFilters', ->
-    afterEach -> @subject.standardizeFilter.restore()
-    Given -> sinon.stub(@subject, 'standardizeFilter')
-    Given -> @subject.standardizeFilter.withArgs('bar').returns 'return "a bar filter"'
-    Given -> @subject.standardizeFilter.withArgs('baz').returns 'return "a baz filter"'
+    afterEach -> @subject.parse.restore()
+    Given -> sinon.stub(@subject, 'parse')
+    Given -> @subject.parse.withArgs('bar').returns 'a bar filter'
+    Given -> @subject.parse.withArgs('baz').returns 'a baz filter'
     Given -> @obj = { match: 'foo|bar | baz' }
-    When -> @list = @subject.makeFilters(@obj, '|')
-    Then -> @obj.match.should.eql 'foo'
-    And -> @list[0]().should.eql 'a bar filter'
-    And -> @list[1]().should.eql 'a baz filter'
+    Then -> @subject.makeFilters(@obj, '|').should.eql ['a bar filter', 'a baz filter']
 
   describe '.applyFilters', ->
-    Given -> @reverse = (f, s) -> s.split('').reverse().join('')
-    Given -> @capitalize = (f, s) -> _.capitalize(s)
-    Then -> @subject.applyFilters('banana', postFilters: [@capitalize, @reverse]).should.eql 'ananaB'
+    Given -> @filters.foo = (word) -> _.capitalize(word)
+    Given -> @filters.bar = (count, word) -> _.pad(word, count)
+    Then -> @subject.applyFilters('banana', [
+      name: 'foo'
+      params: []
+    ,
+      name: 'bar'
+      params: [9]
+    ]).should.eql ' Banana  '
+
+  describe '.invokeFilter', ->
+    Given -> @filters.peel = sinon.stub()
+    When -> @subject.invokeFilter 'current value',
+      name: 'peel'
+      params: [1, 2]
+    Then -> @filters.peel.calledWith('current value', 1, 2).should.be.true
 
   describe '.concat', ->
     context 'type exists', ->
@@ -118,6 +134,15 @@ describe 'whimsy', ->
         apple: ['baz', 'quux', 'foo']
       Given -> @subject.get.withArgs(['foo', 'bar']).returns 'foo'
       Then -> @subject.generate('fruits.banana').should.eql 'foo'
+
+    context 'with pre filters', ->
+      Given -> @filter =
+        name: 'blah'
+        params: ['banana']
+      Given -> @filters.blah = sinon.stub()
+      Given -> @words.banana = ['foo', 'bar']
+      When -> @subject.generate('banana', [@filter])
+      Then -> @filters.blah.calledWith('banana', ['foo', 'bar']).should.be.true
 
   describe '.get', ->
     afterEach -> _.random.restore()

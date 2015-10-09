@@ -101,6 +101,8 @@ describe 'whimsy required as a module', ->
 
       context 'saveAs', ->
 
+      context 'include', ->
+
     context 'with both pre and post filters', ->
       afterEach -> _.random.restore()
       Given -> sinon.stub(_, 'random').returns 0

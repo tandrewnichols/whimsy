@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var mocha = require('gulp-mocha');
 var jshint = require('gulp-jshint');
 var paths = {
-  tests: 'test/**/*.coffee',
+  tests: ['test/helpers/**/*.coffee', 'test/**/*.coffee'],
   lib: ['lib/**/*.js', 'bin/**/*.js']
 };
 
@@ -11,7 +11,7 @@ gulp.task('test', function() {
     .pipe(mocha({
       reporter: 'dot',
       ui: 'mocha-given',
-      require: ['coffee-script/register', 'should']
+      require: ['coffee-script/register', 'should', 'should-sinon']
     }));
 });
 
@@ -32,4 +32,5 @@ gulp.task('watch', function() {
   gulp.watch(paths.lib.concat(paths.tests), ['test']);
 });
 
+gulp.task('default', ['lint', 'test']);
 gulp.task('ci', ['lint', 'test']);

@@ -103,7 +103,7 @@ describe 'whimsy', ->
     When -> @subject.invokeFilter 'current value',
       name: 'peel'
       params: [1, 2]
-    Then -> @filters.peel.calledWith('current value', 1, 2).should.be.true
+    Then -> @filters.peel.should.have.been.calledWith( 1, 2, 'current value')
 
   describe '.concat', ->
     context 'type exists', ->
@@ -142,7 +142,7 @@ describe 'whimsy', ->
       Given -> @filters.blah = sinon.stub()
       Given -> @words.banana = ['foo', 'bar']
       When -> @subject.generate('banana', [@filter])
-      Then -> @filters.blah.calledWith('banana', ['foo', 'bar']).should.be.true
+      Then -> @filters.blah.should.have.been.calledWith('banana', ['foo', 'bar'])
 
   describe '.get', ->
     afterEach -> _.random.restore()

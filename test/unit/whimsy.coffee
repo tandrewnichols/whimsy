@@ -2,9 +2,15 @@ sinon = require 'sinon'
 _ = require 'lodash'
 
 describe 'whimsy', ->
-  Given -> @words = require '../../lib/parts-of-speech'
-  Given -> @filters = require '../../lib/filters'
-  Given -> @subject = require '../../lib/whimsy'
+  Given -> @lists =
+    foo: ['a', 'b']
+    bar:
+      baz: ['quux']
+  Given -> @words =
+    get: => @lists
+  Given -> @filters = require '../../lib/filters',
+  Given -> @subject = proxyquire '../../lib/whimsy',
+    './words': @words
 
   describe 'interpolation', ->
     afterEach -> @subject.interpolate.restore()
@@ -117,19 +123,19 @@ describe 'whimsy', ->
     Given -> sinon.stub(@subject, 'get')
 
     context 'as a literal array', ->
-      Given -> @words.banana = ['foo', 'bar', 'foo']
+      Given -> @lists.banana = ['foo', 'bar', 'foo']
       Given -> @subject.get.withArgs(['foo', 'bar']).returns 'foo'
       Then -> @subject.generate('banana').should.eql 'foo'
 
     context 'as an object of arrays', ->
-      Given -> @words.fruits =
+      Given -> @lists.fruits =
         banana: ['foo', 'bar']
         apple: ['baz', 'quux', 'foo']
       Given -> @subject.get.withArgs(['foo', 'bar', 'baz', 'quux']).returns 'foo'
       Then -> @subject.generate('fruits').should.eql 'foo'
 
     context 'nested property', ->
-      Given -> @words.fruits =
+      Given -> @lists.fruits =
         banana: ['foo', 'bar']
         apple: ['baz', 'quux', 'foo']
       Given -> @subject.get.withArgs(['foo', 'bar']).returns 'foo'
@@ -140,7 +146,7 @@ describe 'whimsy', ->
         name: 'blah'
         params: ['banana']
       Given -> @filters.blah = sinon.stub()
-      Given -> @words.banana = ['foo', 'bar']
+      Given -> @lists.banana = ['foo', 'bar']
       When -> @subject.generate('banana', [@filter])
       Then -> @filters.blah.should.have.been.calledWith('banana', ['foo', 'bar'])
 

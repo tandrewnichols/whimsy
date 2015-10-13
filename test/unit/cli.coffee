@@ -20,7 +20,9 @@ describe 'cli', ->
   describe '.add', ->
     afterEach -> @subject.logBlock.restore()
     Given -> sinon.stub @subject, 'logBlock'
-    Given -> @fs.writeFile.withArgs(@path, sinon.match.string, { encoding: 'utf8' }, sinon.match.func).callsArgWith 3, null, 'blah'
+    Given -> @words.stringify = sinon.stub()
+    Given -> @words.stringify.withArgs(@lists).returns 'many bananas'
+    Given -> @fs.writeFile.withArgs(@path, 'many bananas', { encoding: 'utf8' }, sinon.match.func).callsArgWith 3, null, 'blah'
 
     context 'top level object', ->
       Given -> @lists.banana = ['foo']

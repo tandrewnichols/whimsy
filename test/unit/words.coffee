@@ -41,9 +41,10 @@ describe 'words', ->
       people:
         threeNames: ['John Phillip Sousa', 'Phillip Seymour Hoffman']
         twoNames: ['Morgan Freeman']
-    When -> @subject.stringify @obj
-    Then -> @obj.should.eql
+    When -> @result = @subject.stringify @obj
+    Then -> @result.should.eql JSON.stringify
       fruits: "banana, apple, kiwi"
       people:
         threeNames: "John Phillip Sousa, Phillip Seymour Hoffman"
         twoNames: "Morgan Freeman"
+    , null, 2

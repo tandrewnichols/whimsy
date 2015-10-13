@@ -1,7 +1,11 @@
 clear = require 'clear-require'
 _ = require 'lodash'
+orig = require '../../lib/parts-of-speech'
+words = require '../../lib/words'
+fs = require 'fs'
 
 describe.skip 'whimsy as a command line binary', ->
+  afterEach (done) -> fs.writeFile './lib/parts-of-speech.json', words.stringify(orig), { encoding: 'utf8' }, -> done()
   Given -> @spawn = require('child_process').spawn
 
   describe '.add', ->

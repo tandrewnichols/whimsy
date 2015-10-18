@@ -54,6 +54,18 @@ describe 'cli', ->
         @fs.writeFile.should.not.have.been.called()
 
   describe '.remove', ->
+    afterEach -> @subject.logBlock.restore()
+    Given -> sinon.stub @subject, 'logBlock'
+    Given -> @words.stringify = sinon.stub()
+    Given -> @words.stringify.withArgs(@lists).returns 'many bananas'
+    Given -> @fs.writeFile.withArgs(@path, 'many bananas', { encoding: 'utf8' }, sinon.match.func).callsArgWith 3, null, 'blah'
+
+    context 'top level object', ->
+      Given -> @lists.banana = ['foo']
+      When -> @subject.remove 'banana', ['foo'], {}
+      Then ->
+        @lists.banana.should.eql []
+        @subject.logBlock.should.have.been.calledWith chalk.green(1), 'banana', 'removed'
 
   describe '.logBlock', ->
     afterEach -> console.log.restore()

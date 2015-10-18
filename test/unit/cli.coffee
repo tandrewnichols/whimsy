@@ -26,7 +26,7 @@ describe 'cli', ->
 
     context 'top level object', ->
       Given -> @lists.banana = ['foo']
-      When -> @subject.add 'banana', 'bar', {}
+      When -> @subject.add 'banana', ['bar'], {}
       Then ->
         @lists.banana.should.eql ['foo', 'bar']
         @subject.logBlock.should.have.been.calledWith chalk.green(1), 'banana', 'added'
@@ -34,21 +34,21 @@ describe 'cli', ->
     context 'nested object', ->
       Given -> @lists.fruit =
         banana: ['foo']
-      When -> @subject.add 'fruit.banana', 'bar', {}
+      When -> @subject.add 'fruit.banana', ['bar'], {}
       Then ->
         @lists.fruit.banana.should.eql ['foo', 'bar']
         @subject.logBlock.should.have.been.calledWith chalk.green(1), 'fruit.banana', 'added'
 
     context 'multiple words', ->
       Given -> @lists.banana = ['foo']
-      When -> @subject.add 'banana', 'bar', 'baz', 'quux', {}
+      When -> @subject.add 'banana', ['bar', 'baz', 'quux'], {}
       Then ->
         @lists.banana.should.eql ['foo', 'bar', 'baz', 'quux']
         @subject.logBlock.should.have.been.calledWith chalk.green(3), 'banana', 'added'
 
     context 'duplicate words', ->
       Given -> @lists.banana = ['foo']
-      When -> @subject.add 'banana', 'foo', {}
+      When -> @subject.add 'banana', ['foo'], {}
       Then ->
         @lists.banana.should.eql ['foo']
         @fs.writeFile.should.not.have.been.called()

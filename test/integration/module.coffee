@@ -1,8 +1,10 @@
 sinon = require 'sinon'
 _ = require 'lodash'
+words = require '../../lib/words'
+clear = require 'clear-require'
 
 describe 'whimsy required as a module', ->
-  Given -> @words = require '../../lib/parts-of-speech'
+  Given -> @words = words.get()
   Given -> @subject = require '../../lib/whimsy'
 
   describe '.noun', ->
@@ -61,52 +63,48 @@ describe 'whimsy required as a module', ->
 
     context 'nested property', ->
 
-    context 'with post filters', ->
+    context 'with filters:', ->
       afterEach -> _.random.restore()
       Given -> sinon.stub(_, 'random').returns 0
 
-      context 'pluralize', ->
-        Then -> @subject('{{ noun | pluralize }}').should.eql 'fires'
-      
-      context 'capitalize', ->
-        Then -> @subject('{{ noun | capitalize }}').should.eql 'Fire'
-
-      context 'past', ->
-        Then -> @subject('{{ verb | past }}').should.eql 'finagled'
-
-      context 'past particple', ->
-        Then -> @subject('{{ verb | past_participle }}').should.eql 'finagled'
-
-      context 'conjugate', ->
-        Then -> @subject('{{ verb | conjugate("he") }}').should.eql 'finagles'
-
-    context 'with pre filters', ->
-      afterEach -> _.random.restore()
-      Given -> sinon.stub(_, 'random').returns 0
-
-      context 'startsWith', ->
-        Then -> @subject('{{ noun : startsWith("a") }}').should.eql 'alley'
-
-      context 'endsWith', ->
-        Then -> @subject('{{ noun : endsWith("t") }}').should.eql 'sheet'
-
-      context 'contains', ->
-        Then -> @subject('{{ noun : contains("u") }}').should.eql 'biscuit'
-
-      context 'matching', ->
-
-      context 'greaterThan', ->
+      context 'post', ->
+        context 'pluralize', ->
+          Then -> @subject('{{ noun | pluralize }}').should.eql 'fires'
         
-      context 'lessThan', ->
+        context 'capitalize', ->
+          Then -> @subject('{{ noun | capitalize }}').should.eql 'Fire'
 
-      context 'saveAs', ->
+        context 'past', ->
+          Then -> @subject('{{ verb | past }}').should.eql 'finagled'
 
-      context 'include', ->
+        context 'past particple', ->
+          Then -> @subject('{{ verb | past_participle }}').should.eql 'finagled'
 
-    context 'with both pre and post filters', ->
-      afterEach -> _.random.restore()
-      Given -> sinon.stub(_, 'random').returns 0
-      Then -> @subject('{{ noun : startsWith("s") | capitalize }}').should.eql 'Sheet'
+        context 'conjugate', ->
+          Then -> @subject('{{ verb | conjugate("he") }}').should.eql 'finagles'
+
+      context 'pre', ->
+        context 'startsWith', ->
+          Then -> @subject('{{ noun : startsWith("a") }}').should.eql 'alley'
+
+        context 'endsWith', ->
+          Then -> @subject('{{ noun : endsWith("t") }}').should.eql 'sheet'
+
+        context 'contains', ->
+          Then -> @subject('{{ noun : contains("u") }}').should.eql 'biscuit'
+
+        context 'matching', ->
+
+        context 'greaterThan', ->
+          
+        context 'lessThan', ->
+
+        context 'saveAs', ->
+
+        context 'include', ->
+
+      context 'with both pre and post filters', ->
+        Then -> @subject('{{ noun : startsWith("s") | capitalize }}').should.eql 'Sheet'
 
     context 'called with a count', ->
       Then -> @subject('{{ noun }}', 5).length.should.eql 5

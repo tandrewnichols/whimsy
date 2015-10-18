@@ -28,8 +28,8 @@ describe 'words', ->
       bar:
         baz: "ellipsis, syrup, toga party"
         quux: "hello world"
-    When -> @subject.parse @obj
-    Then -> @obj.should.eql
+    When -> @newObj = @subject.parse @obj
+    Then -> @newObj.should.eql
       foo: ['blah', 'banana', 'chicken soup']
       bar:
         baz: ['ellipsis', 'syrup', 'toga party']

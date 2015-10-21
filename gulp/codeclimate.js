@@ -1,13 +1,11 @@
 var gulp = require('gulp');
 var cp = require('child_process');
+var codeclimate = require('gulp-codeclimate-reporter');
 
-gulp.task('codeclimate', function(cb) {
+gulp.task('codeclimate', ['test'], function(cb) {
   if (process.version.indexOf('v4') > -1) {
-    cp.exec('codeclimate-test-reporter < coverage/lcov.info', function(err) {
-      cb(err);
-    });
-  } else {
-    cb();
+    gulp.src('coverage/lcov.info', { read: false })
+      .pipe(codeclimate());
   }
 });
 

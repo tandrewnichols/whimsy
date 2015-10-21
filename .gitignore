@@ -2,3 +2,4 @@ node_modules/
 *.sw*
 npm-debug.log
 .DS_STORE
+coverage

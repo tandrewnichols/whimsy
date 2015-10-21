@@ -8,6 +8,11 @@ describe 'bin/whimsy', ->
     add: sinon.stub()
     remove: sinon.stub()
 
+  context 'has the correct version', ->
+    When -> @subject = proxyquire '../../bin/whimsy',
+      '../lib/cli': @cli
+    Then -> @subject.version.should.eql '1.0.0'
+
   describe '.add', ->
     Given -> process.argv = ['node', 'whimsy', 'add', 'noun', 'foo']
     When -> @subject = proxyquire '../../bin/whimsy',

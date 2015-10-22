@@ -78,20 +78,20 @@ describe 'whimsy required as a module', ->
           Then -> @subject('{{ verb | past }}').should.eql 'finagled'
 
         context 'past particple', ->
-          Then -> @subject('{{ verb | past_participle }}').should.eql 'finagled'
+          Then -> @subject('{{ verb | pastParticiple }}').should.eql 'finagled'
 
         context 'conjugate', ->
           Then -> @subject('{{ verb | conjugate("he") }}').should.eql 'finagles'
 
       context 'pre', ->
         context 'startsWith', ->
-          Then -> @subject('{{ noun : startsWith("a") }}').should.eql 'alley'
+          Then -> @subject('{{ noun | startsWith("a") }}').should.eql 'alley'
 
         context 'endsWith', ->
-          Then -> @subject('{{ noun : endsWith("t") }}').should.eql 'sheet'
+          Then -> @subject('{{ noun | endsWith("t") }}').should.eql 'sheet'
 
         context 'contains', ->
-          Then -> @subject('{{ noun : contains("u") }}').should.eql 'biscuit'
+          Then -> @subject('{{ noun | contains("u") }}').should.eql 'biscuit'
 
         context 'matching', ->
 
@@ -104,7 +104,7 @@ describe 'whimsy required as a module', ->
         context 'include', ->
 
       context 'with both pre and post filters', ->
-        Then -> @subject('{{ noun : startsWith("s") | capitalize }}').should.eql 'Sheet'
+        Then -> @subject('{{ noun | startsWith("s") | capitalize }}').should.eql 'Sheet'
 
     context 'called with a count', ->
       Then -> @subject('{{ noun }}', 5).length.should.eql 5

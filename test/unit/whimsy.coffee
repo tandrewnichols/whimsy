@@ -38,28 +38,24 @@ describe 'whimsy', ->
     Given -> sinon.stub @subject, 'makeFilters'
     Given -> sinon.stub @subject, 'generate'
     Given -> sinon.stub @subject, 'applyFilters'
+    Given -> @filters.preFilters = ['inspect', 'peel']
+    Given -> @filters.postFilters = ['eat', 'throw away']
 
     context 'no filters', ->
-      Given -> @subject.generate.withArgs('banana').returns 'yellow'
-      Given -> @subject.makeFilters.withArgs(
-        match: 'banana'
-      , '|').returns 'post filters'
-      Given -> @subject.makeFilters.withArgs(
-        match: 'banana'
-      , ':').returns 'pre filters'
-      Given -> @subject.applyFilters.withArgs('yellow', 'post filters').returns 'done'
+      Given -> @subject.makeFilters.withArgs(match: 'banana').returns []
+      Given -> @subject.generate.withArgs('banana', []).returns 'yellow'
+      Given -> @subject.applyFilters.withArgs('yellow', []).returns 'done'
       Then -> @subject.interpolate('{{ banana }}', 'banana').should.eql 'done'
 
     context 'with filters', ->
-      Given -> @subject.generate.withArgs('banana : peel | eat').returns 'yellow'
-      Given -> @subject.makeFilters.withArgs(
-        match: 'banana : peel | eat'
-      , '|').returns 'post filters'
-      Given -> @subject.makeFilters.withArgs(
-        match: 'banana : peel | eat'
-      , ':').returns 'pre filters'
-      Given -> @subject.applyFilters.withArgs('yellow', 'post filters').returns 'done'
-      Then -> @subject.interpolate('{{ banana | pluralize }}', 'banana : peel | eat ').should.eql 'done'
+      Given -> @subject.makeFilters.withArgs(match: 'banana | peel | eat').returns [
+        name: 'peel'
+      ,
+        name: 'eat'
+      ]
+      Given -> @subject.generate.withArgs('banana | peel | eat', [name: 'peel']).returns 'yellow'
+      Given -> @subject.applyFilters.withArgs('yellow', [name: 'eat']).returns 'done'
+      Then -> @subject.interpolate('{{ banana | pluralize }}', 'banana | peel | eat ').should.eql 'done'
 
   describe '.parse', ->
     afterEach -> delete @filters.foo
@@ -91,7 +87,7 @@ describe 'whimsy', ->
     Given -> @subject.parse.withArgs('bar').returns 'a bar filter'
     Given -> @subject.parse.withArgs('baz').returns 'a baz filter'
     Given -> @obj = { match: 'foo|bar | baz' }
-    Then -> @subject.makeFilters(@obj, '|').should.eql ['a bar filter', 'a baz filter']
+    Then -> @subject.makeFilters(@obj).should.eql ['a bar filter', 'a baz filter']
 
   describe '.applyFilters', ->
     Given -> @filters.foo = (word) -> _.capitalize(word)

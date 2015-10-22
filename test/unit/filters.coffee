@@ -13,8 +13,8 @@ describe 'filters', ->
   describe '.past', ->
     Then -> @subject.past('go').should.eql 'went'
 
-  describe '.past_participle', ->
-    Then -> @subject.past_participle('go').should.eql 'gone'
+  describe '.pastParticiple', ->
+    Then -> @subject.pastParticiple('go').should.eql 'gone'
 
   describe '.conjugate', ->
     context 'third person', ->

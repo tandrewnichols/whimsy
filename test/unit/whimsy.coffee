@@ -17,8 +17,8 @@ describe 'whimsy', ->
     Given -> sinon.stub(@subject, 'interpolate')
 
     context 'no duplicates', ->
-      Given -> @subject.interpolate.withArgs('{{ adjective }}', 'adjective ').returns 'illustrious'
-      Given -> @subject.interpolate.withArgs('{{ noun }}', 'noun ').returns 'chicken'
+      Given -> @subject.interpolate.withArgs('{{ adjective }}', 'adjective').returns 'illustrious'
+      Given -> @subject.interpolate.withArgs('{{ noun }}', 'noun').returns 'chicken'
       Then -> @subject('The {{ adjective }} {{ noun }}').should.eql 'The illustrious chicken'
 
     context 'with duplicates', ->
@@ -72,9 +72,30 @@ describe 'whimsy', ->
         params: []
 
     context 'parens with a parameter', ->
-      Then -> @subject.parse('foo("bar")').should.eql
-        name: 'foo'
-        params: ['bar']
+      context '- a simple string', ->
+        Then -> @subject.parse('foo("bar")').should.eql
+          name: 'foo'
+          params: ['bar']
+
+      context '- a string with a comma in it', ->
+        Then -> @subject.parse('foo("bar, baz", "blah")').should.eql
+          name: 'foo'
+          params: ['bar, baz', 'blah']
+
+      context '- a number', ->
+        Then -> @subject.parse('foo(5, "blah, blah", "bar")').should.eql
+          name: 'foo'
+          params: [5, 'blah, blah', 'bar']
+
+      context '- an array', ->
+        Then -> @subject.parse('foo(["a", "b", "c"], "bar")').should.eql
+          name: 'foo'
+          params: [["a", "b", "c"], "bar"]
+
+      context '- an object', ->
+        Then -> @subject.parse('foo({ "a": "b" }, "bar")').should.eql
+          name: 'foo'
+          params: [{ "a": "b" }, "bar"]
 
     context 'function is not a filter', ->
       Then -> @subject.parse('bar()').should.eql
@@ -150,6 +171,17 @@ describe 'whimsy', ->
     afterEach -> _.random.restore()
     Given -> sinon.stub(_, 'random').withArgs(3).returns 2
     Then -> @subject.get([1,2,3,4]).should.eql 3
+
+  describe '.register', ->
+    context 'post filter', ->
+      When -> @subject.register 'foo', 'bar'
+      Then -> @filters.foo.should.eql 'bar'
+      And -> 'foo'.should.be.oneOf @filters.postFilters
+
+    context 'pre filter', ->
+      When -> @subject.register 'foo', 'bar', true
+      Then -> @filters.foo.should.eql 'bar'
+      And -> 'foo'.should.be.oneOf @filters.preFilters
 
   describe 'parts of speech', ->
     afterEach -> @subject.generate.restore()

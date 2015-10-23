@@ -94,17 +94,61 @@ describe 'whimsy required as a module', ->
           Then -> @subject('{{ noun | contains("u") }}').should.eql 'biscuit'
 
         context 'matching', ->
+          Then -> @subject('{{ noun | matching("[aeiou]{2,}") }}').should.eql 'sheet'
 
         context 'greaterThan', ->
+          Then -> @subject('{{ noun | greaterThan(5) }}').should.eql 'prophecy'
           
         context 'lessThan', ->
+          Then -> @subject('{{ noun | lessThan(4) }}').should.eql 'wit'
 
         context 'saveAs', ->
+          context 'no filter on reuse', ->
+            Then -> @subject('{{ noun | saveAs("blah") }}|{{ blah }}').should.eql 'fire|fire'
+
+          context 'with a filter on reuse', ->
+            Then -> @subject('{{ noun | saveAs("blah") }}|{{ blah | capitalize }}').should.eql 'fire|Fire'
 
         context 'include', ->
+          context 'with an array', ->
+            Given -> _.random.returns 7
+            Then -> @subject('{{ conjunction.coordinating | include(["foo"]) }}').should.eql 'foo'
+
+          context 'with a string', ->
+            Given -> _.random.returns 7
+            Then -> @subject('{{ conjunction.coordinating | include("foo") }}').should.eql 'foo'
+
+        context 'exclude', ->
+          context 'with an array', ->
+            Then -> @subject('{{ noun | exclude(["fire"]) }}').should.eql 'sheet'
 
       context 'with both pre and post filters', ->
-        Then -> @subject('{{ noun | startsWith("s") | capitalize }}').should.eql 'Sheet'
+        context 'in the right order', ->
+          Then -> @subject('{{ noun | startsWith("s") | capitalize }}').should.eql 'Sheet'
+
+        context 'not in the right order', ->
+          Then -> @subject('{{ noun | capitalize | startsWith("s") }}').should.eql 'Sheet'
+
+      context 'with registered filters', ->
+        context 'post filter', ->
+          When -> @subject.register 'reverse', (word) ->
+            return word.split('').reverse().join('')
+          Then -> @subject('{{ noun | reverse }}').should.eql 'erif'
+
+        context 'pre filter', ->
+          context 'with no additional args', ->
+            When -> @subject.register 'containingU', (list) ->
+              return _.filter list, (item) ->
+                return item.indexOf('u') > -1
+            , true
+            Then -> @subject('{{ noun | containingU }}').should.eql 'biscuit'
+          
+          context 'with additional args', ->
+            When -> @subject.register 'containing', (letter, list) ->
+              return _.filter list, (item) ->
+                return item.indexOf(letter) > -1
+            , true
+            Then -> @subject('{{ noun | containing("u") }}').should.eql 'biscuit'
 
     context 'called with a count', ->
       Then -> @subject('{{ noun }}', 5).length.should.eql 5

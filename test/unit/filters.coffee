@@ -31,3 +31,31 @@ describe 'filters', ->
 
   describe '.contains', ->
     Then -> @subject.contains('s', ['bassinet', 'swoon', 'help']).should.eql ['bassinet', 'swoon']
+
+  describe '.matching', ->
+    Then -> @subject.matching('d$', ['beef', 'food', 'mud']).should.eql ['food', 'mud']
+
+  describe '.greaterThan', ->
+    Then -> @subject.greaterThan(3, ['foo', 'bar', 'baz', 'quux']).should.eql ['quux']
+
+  describe '.lessThan', ->
+    Then -> @subject.lessThan(4, ['foo', 'bar', 'baz', 'quux']).should.eql ['foo', 'bar', 'baz']
+
+  describe '.saveAs', ->
+    When -> @subject.saveAs('foo', 'bar')
+    Then -> @subject._refs.should.eql
+      foo: 'bar'
+
+  describe '.include', ->
+    context 'with an array', ->
+      Then -> @subject.include(['baz', 'quux'], ['foo', 'bar']).should.eql ['foo', 'bar', 'baz', 'quux']
+
+    context 'with a string', ->
+      Then -> @subject.include('baz', ['foo', 'bar']).should.eql ['foo', 'bar', 'baz']
+
+  describe '.exclude', ->
+    context 'with an array', ->
+      Then -> @subject.exclude(['foo', 'baz'], ['foo', 'bar', 'baz']).should.eql ['bar']
+
+    context 'with an array', ->
+      Then -> @subject.exclude('foo', ['foo', 'bar']).should.eql ['bar']

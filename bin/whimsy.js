@@ -2,6 +2,7 @@
 
 var program = module.exports = require('commander');
 var cli = require('../lib/cli');
+var whimsy = require('../lib/whimsy');
 
 program.version = require('../package').version;
 program.name = 'whimsy';
@@ -16,5 +17,10 @@ program
   .alias('rm')
   .description('Remove a word from the list of words')
   .action(cli.remove);
+ 
+program
+  .command('noun [count]')
+  .description('Genereate a noun')
+  .action(cli.writeResult(whimsy.noun));
 
 program.parse(process.argv);

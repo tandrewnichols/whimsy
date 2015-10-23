@@ -31,7 +31,29 @@ describe 'whimsy as a command line binary', ->
       Then -> _.filter(@nouns, @filter).length.should.eql 1
 
   describe '.remove', ->
+    context 'single word', ->
+      Given -> clear '../../lib/parts-of-speech'
+      When (done) -> @spawn(whimsy, ['remove', 'noun', 'fire']).on 'close', -> done()
+      And -> @nouns = require('../../lib/parts-of-speech').noun.split(reg)
+      Then -> 'fire'.should.not.be.oneOf(@nouns)
+
+    context 'multiple words', ->
+      Given -> clear '../../lib/parts-of-speech'
+      When (done) -> @spawn(whimsy, ['remove', 'noun', 'fire', 'sheet']).on 'close', -> done()
+      And -> @nouns = require('../../lib/parts-of-speech').noun.split(reg)
+      Then -> _.intersection(['fire', 'sheet'], @nouns).should.eql []
+
+  context 'generating', ->
     Given -> clear '../../lib/parts-of-speech'
-    When (done) -> @spawn(whimsy, ['remove', 'noun', 'fire']).on 'close', -> done()
-    And -> @nouns = require('../../lib/parts-of-speech').noun.split(reg)
-    Then -> 'fire'.should.not.be.oneOf(@nouns)
+    Given -> @output = ''
+    Given -> @capture = (args, done) =>
+      child = @spawn(whimsy, args)
+      child.stdout.on 'data', (data) =>
+        @output += data.toString()
+      child.on 'close', -> done()
+
+    describe '.noun', ->
+      When (done) -> @capture(['noun'], done)
+      And -> @nouns = require('../../lib/parts-of-speech').noun.split(reg)
+      Then -> @output.should.be.oneOf @nouns
+

@@ -67,6 +67,14 @@ describe 'cli', ->
         @lists.banana.should.eql []
         @subject.logBlock.should.have.been.calledWith chalk.green(1), 'banana', 'removed'
 
+  describe '.writeResult', ->
+    afterEach -> process.stdout.write.restore()
+    Given -> sinon.stub process.stdout, 'write'
+    Given -> @foo = -> 'bar'
+    When -> @func = @subject.writeResult @foo
+    And -> @func()
+    Then -> process.stdout.write.should.have.been.calledWith 'bar'
+
   describe '.logBlock', ->
     afterEach -> console.log.restore()
     Given -> sinon.stub console, 'log'

@@ -10,6 +10,7 @@ var _ = require('lodash');
 
 program.version = require('../package').version;
 program.name = 'whimsy';
+program.setMaxListeners(20);
 
 program
   .command('add <type> <words...>')

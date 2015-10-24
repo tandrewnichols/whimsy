@@ -21,6 +21,8 @@ describe 'bin/whimsy', ->
     remove: sinon.stub()
     writeResult: (fn) -> fn
 
+  Given -> clear 'commander'
+
   context 'has the correct setup', ->
     When -> @subject = proxyquire '../../bin/whimsy',
       '../lib/cli': @cli

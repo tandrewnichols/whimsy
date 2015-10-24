@@ -11,17 +11,41 @@ describe 'whimsy required as a module', ->
     context 'no options', ->
       Then -> @subject.noun().should.be.oneOf @words.noun
 
+    context 'with a count', ->
+      When -> @generated = @subject.noun({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
+
   describe '.verb', ->
     context 'no options', ->
       Then -> @subject.verb().should.be.oneOf @words.verb
+
+    context 'with a count', ->
+      When -> @generated = @subject.verb({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe '.adjective', ->
     context 'no options', ->
       Then -> @subject.adjective().should.be.oneOf @words.adjective
+
+    context 'with a count', ->
+      When -> @generated = @subject.adjective({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
      
   describe '.adverb', ->
     context 'no options', ->
       Then -> @subject.adverb().should.be.oneOf @words.adverb
+
+    context 'with a count', ->
+      When -> @generated = @subject.adverb({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe '.pronoun', ->
     context 'top level', ->
@@ -29,10 +53,22 @@ describe 'whimsy required as a module', ->
 
     context 'nested', ->
       Then -> @subject.pronoun('reflexive').should.be.oneOf @words.pronoun.reflexive
+
+    context 'with a count', ->
+      When -> @generated = @subject.pronoun('reflexive', { count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe '.preposition', ->
     context 'no options', ->
       Then -> @subject.preposition().should.be.oneOf @words.preposition
+
+    context 'with a count', ->
+      When -> @generated = @subject.preposition({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe '.conjunction', ->
     context 'top level', ->
@@ -40,14 +76,32 @@ describe 'whimsy required as a module', ->
 
     context 'nested', ->
       Then -> @subject.conjunction('correlative').should.be.oneOf @words.conjunction.correlative
+
+    context 'with a count', ->
+      When -> @generated = @subject.conjunction({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe '.interjection', ->
     context 'no options', ->
       Then -> @subject.interjection().should.be.oneOf @words.interjection
+
+    context 'with a count', ->
+      When -> @generated = @subject.interjection({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe '.article', ->
     context 'no options', ->
       Then -> @subject.article().should.be.oneOf @words.article
+
+    context 'with a count', ->
+      When -> @generated = @subject.article({ count: 2 })
+      Then ->
+        @generated.should.be.an.instanceof(Array)
+        @generated.length.should.eql 2
     
   describe 'called as a function', ->
     context 'no duplicates', ->

@@ -2,15 +2,9 @@ sinon = require 'sinon'
 _ = require 'lodash'
 
 describe 'whimsy', ->
-  Given -> @lists =
-    foo: ['a', 'b']
-    bar:
-      baz: ['quux']
-  Given -> @words =
-    get: => @lists
   Given -> @filters = require '../../lib/filters',
-  Given -> @subject = proxyquire '../../lib/whimsy',
-    './words': @words
+  Given -> @lists = require('../../lib/words').get()
+  Given -> @subject = require '../../lib/whimsy'
 
   describe 'interpolation', ->
     afterEach -> @subject.interpolate.restore()
@@ -167,6 +161,18 @@ describe 'whimsy', ->
       When -> @subject.generate('banana', [@filter])
       Then -> @filters.blah.should.have.been.calledWith('banana', ['foo', 'bar'])
 
+    context 'with options.count', ->
+      Given -> @filter =
+        name: 'blah'
+        params: ['banana']
+      Given -> @filters.blah = sinon.stub()
+      Given -> @lists.banana = ['foo', 'bar']
+      When -> @result = @subject.generate('banana', { count: 2 }, [@filter])
+      Then ->
+        @filters.blah.should.have.been.calledWith('banana', ['foo', 'bar'])
+        @result.should.be.an.instanceof Array
+        @result.length.should.eql 2
+
   describe '.get', ->
     afterEach -> _.random.restore()
     Given -> sinon.stub(_, 'random').withArgs(3).returns 2
@@ -188,47 +194,92 @@ describe 'whimsy', ->
     Given -> sinon.stub(@subject, 'generate')
 
     describe '.noun', ->
-      Given -> @subject.generate.withArgs('noun').returns 'banana'
-      Then -> @subject.noun().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('noun', {}).returns 'banana'
+        Then -> @subject.noun().should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('noun', { count: 2 }).returns ['banana', 'orange']
+        Then -> @subject.noun({ count: 2 }).should.eql ['banana', 'orange']
 
     describe '.verb', ->
-      Given -> @subject.generate.withArgs('verb').returns 'banana'
-      Then -> @subject.verb().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('verb', {}).returns 'banana'
+        Then -> @subject.verb().should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('verb', { count: 2 }).returns 'banana'
+        Then -> @subject.verb({ count: 2 }).should.eql 'banana'
 
     describe '.adjective', ->
-      Given -> @subject.generate.withArgs('adjective').returns 'banana'
-      Then -> @subject.adjective().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('adjective', {}).returns 'banana'
+        Then -> @subject.adjective().should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('adjective', { count: 2 }).returns 'banana'
+        Then -> @subject.adjective({ count: 2 }).should.eql 'banana'
 
     describe '.adverb', ->
-      Given -> @subject.generate.withArgs('adverb').returns 'banana'
-      Then -> @subject.adverb().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('adverb', {}).returns 'banana'
+        Then -> @subject.adverb().should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('adverb', { count: 2 }).returns 'banana'
+        Then -> @subject.adverb({ count: 2 }).should.eql 'banana'
 
     describe '.pronoun', ->
-      context 'top level', ->
-        Given -> @subject.generate.withArgs('pronoun').returns 'banana'
-        Then -> @subject.pronoun().should.eql 'banana'
+      context 'with no options', ->
+        context 'top level', ->
+          Given -> @subject.generate.withArgs('pronoun', {}).returns 'banana'
+          Then -> @subject.pronoun().should.eql 'banana'
 
-      context 'nested', ->
-        Given -> @subject.generate.withArgs('pronoun.banana').returns 'banana'
-        Then -> @subject.pronoun('banana').should.eql 'banana'
+        context 'nested', ->
+          Given -> @subject.generate.withArgs('pronoun.banana', {}).returns 'banana'
+          Then -> @subject.pronoun('banana').should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('pronoun.banana', { count: 2 }).returns 'banana'
+        Then -> @subject.pronoun('banana', { count: 2 }).should.eql 'banana'
 
     describe '.preposition', ->
-      Given -> @subject.generate.withArgs('preposition').returns 'banana'
-      Then -> @subject.preposition().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('preposition', {}).returns 'banana'
+        Then -> @subject.preposition().should.eql 'banana'
 
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('preposition', { count: 2 }).returns 'banana'
+        Then -> @subject.preposition({ count: 2 }).should.eql 'banana'
+        
     describe '.conjunction', ->
-      context 'top level', ->
-        Given -> @subject.generate.withArgs('conjunction').returns 'banana'
-        Then -> @subject.conjunction().should.eql 'banana'
+      context 'with no options', ->
+        context 'top level', ->
+          Given -> @subject.generate.withArgs('conjunction', {}).returns 'banana'
+          Then -> @subject.conjunction().should.eql 'banana'
 
-      context 'nested', ->
-        Given -> @subject.generate.withArgs('conjunction.banana').returns 'banana'
-        Then -> @subject.conjunction('banana').should.eql 'banana'
+        context 'nested', ->
+          Given -> @subject.generate.withArgs('conjunction.banana', {}).returns 'banana'
+          Then -> @subject.conjunction('banana').should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('conjunction', { count: 2 }).returns 'banana'
+        Then -> @subject.conjunction({ count: 2 }).should.eql 'banana'
 
     describe '.interjection', ->
-      Given -> @subject.generate.withArgs('interjection').returns 'banana'
-      Then -> @subject.interjection().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('interjection', {}).returns 'banana'
+        Then -> @subject.interjection().should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('interjection', { count: 2 }).returns 'banana'
+        Then -> @subject.interjection({ count: 2 }).should.eql 'banana'
 
     describe '.article', ->
-      Given -> @subject.generate.withArgs('article').returns 'banana'
-      Then -> @subject.article().should.eql 'banana'
+      context 'with no options', ->
+        Given -> @subject.generate.withArgs('article', {}).returns 'banana'
+        Then -> @subject.article().should.eql 'banana'
+
+      context 'with a count', ->
+        Given -> @subject.generate.withArgs('article', { count: 2 }).returns 'banana'
+        Then -> @subject.article({ count: 2 }).should.eql 'banana'

@@ -23,10 +23,15 @@ program
   .action(cli.remove);
  
 _.each(lists, function(val, key) {
-  var command = _.isPlainObject(val) ? key + ' [type] [count]' : key + ' [count]';
+  var command = _.isPlainObject(val) ? key + ' [type]' : key;
   program.command(command)
     .description('Generate ' + a(key))
+    .option('-c, --count [count]', 'Generate multiple instances')
     .action(cli.writeResult(whimsy[key]));
+});
+
+program.on('*', function(args) {
+  cli.writeResult(whimsy).apply(null, args.concat({}));
 });
 
 program.parse(process.argv);

@@ -119,3 +119,15 @@ describe 'whimsy as a command line binary', ->
       When (done) -> @capture(['article'], done)
       And -> @articles = @reduce 'article'
       Then -> @output.should.be.oneOf @articles
+
+    describe 'with no specific command', ->
+      context 'with interpolation', ->
+        When (done) -> @capture(["The {{ noun }}"], done)
+        And -> @nouns = @reduce 'noun'
+        Then ->
+          @output.should.match /The [a-z]+/
+          @output.replace('The ', '').should.be.oneOf @nouns
+
+      context 'with no interpolation', ->
+        When (done) -> @capture(["blah"], done)
+        Then -> @output.should.eql 'blah'

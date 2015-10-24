@@ -70,10 +70,18 @@ describe 'cli', ->
   describe '.writeResult', ->
     afterEach -> process.stdout.write.restore()
     Given -> sinon.stub process.stdout, 'write'
-    Given -> @foo = -> 'bar'
-    When -> @func = @subject.writeResult @foo
-    And -> @func()
-    Then -> process.stdout.write.should.have.been.calledWith 'bar'
+    Given -> @foo = sinon.stub()
+    Given -> @foo.returns 'bar'
+
+    context 'with no arguments', ->
+      When -> @func = @subject.writeResult @foo
+      And -> @func()
+      Then -> process.stdout.write.should.have.been.calledWith 'bar'
+
+    context 'with arguments', ->
+      When -> @func = @subject.writeResult @foo
+      And -> @func 'blah', 7, { options: true }
+      Then -> @foo.should.have.been.calledWith 'blah', 7
 
   describe '.logBlock', ->
     afterEach -> console.log.restore()

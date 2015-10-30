@@ -83,6 +83,14 @@ describe 'cli', ->
       And -> @func 'blah', 7, { options: true }
       Then -> @foo.should.have.been.calledWith 'blah', 7
 
+    context 'with options', ->
+      Given -> @foo.returns ['bar', 'baz']
+      When -> @func = @subject.writeResult @foo
+      And -> @func 'blah', 7, { count: 2 }
+      Then ->
+        @foo.should.have.been.calledWith 'blah', 7, { count: 2 }
+        process.stdout.write.should.have.been.calledWith 'bar, baz'
+
   describe '.logBlock', ->
     afterEach -> console.log.restore()
     Given -> sinon.stub console, 'log'

@@ -171,7 +171,7 @@ describe 'bin/whimsy', ->
     Then -> @whimsy.article.calledWith(sinon.match.object).should.be.true
 
   describe 'other random input', ->
-    Given -> process.argv = ['node', 'whimsy', 'foo bar']
+    Given -> process.argv = ['node', 'whimsy.js', 'foo bar']
     When -> @subject = proxyquire '../../bin/whimsy',
       '../lib/cli': @cli
       '../lib/whimsy': @whimsy

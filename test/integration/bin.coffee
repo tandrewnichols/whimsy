@@ -64,69 +64,129 @@ describe 'whimsy as a command line binary', ->
 
 
     describe '.noun', ->
-      When (done) -> @capture(['noun'], done)
-      And -> @nouns = @reduce 'noun'
-      Then -> @output.should.be.oneOf @nouns
+      context 'no options', ->
+        When (done) -> @capture(['noun'], done)
+        And -> @nouns = @reduce 'noun'
+        Then -> @output.should.be.oneOf @nouns
+
+      context 'with a count', ->
+        When (done) -> @capture(['noun', '-c', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe '.verb', ->
-      When (done) -> @capture(['verb'], done)
-      And -> @verbs = require('../../lib/parts-of-speech').verb.split(reg)
-      Then -> @output.should.be.oneOf @verbs
+      context 'no options', ->
+        When (done) -> @capture(['verb'], done)
+        And -> @verbs = @reduce 'verb'
+        Then -> @output.should.be.oneOf @verbs
+
+      context 'with a count', ->
+        When (done) -> @capture(['verb', '-c', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe '.adjective', ->
-      When (done) -> @capture(['adjective'], done)
-      And -> @adjectives = @reduce 'adjective'
-      Then -> @output.should.be.oneOf @adjectives
+      context 'no options', ->
+        When (done) -> @capture(['adjective'], done)
+        And -> @adjectives = @reduce 'adjective'
+        Then -> @output.should.be.oneOf @adjectives
+
+      context 'with a count', ->
+        When (done) -> @capture(['adjective', '--count', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe '.adverb', ->
-      When (done) -> @capture(['adverb'], done)
-      And -> @adverbs = @reduce 'adverb'
-      Then -> @output.should.be.oneOf @adverbs
+      context 'no options', ->
+        When (done) -> @capture(['adverb'], done)
+        And -> @adverbs = @reduce 'adverb'
+        Then -> @output.should.be.oneOf @adverbs
+
+      context 'with a count', ->
+        When (done) -> @capture(['adverb', '-c', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe '.pronoun', ->
       context 'with no subtype', ->
-        When (done) -> @capture(['pronoun'], done)
-        And -> @pronouns = @reduce 'pronoun'
-        Then -> @output.should.be.oneOf @pronouns
+        context 'no options', ->
+          When (done) -> @capture(['pronoun'], done)
+          And -> @pronouns = @reduce 'pronoun'
+          Then -> @output.should.be.oneOf @pronouns
+
+        context 'with a count', ->
+          When (done) -> @capture(['pronoun', '-c', 2], done)
+          Then -> @output.split(reg).length.should.eql 2
 
       context 'with a subtype', ->
-        When (done) -> @capture(['pronoun', 'personal'], done)
-        And -> @pronouns = @reduce 'pronoun', 'personal'
-        Then -> @output.should.be.oneOf @pronouns
+        context 'no options', ->
+          When (done) -> @capture(['pronoun', 'personal'], done)
+          And -> @pronouns = @reduce 'pronoun', 'personal'
+          Then -> @output.should.be.oneOf @pronouns
+
+        context 'with a count', ->
+          When (done) -> @capture(['pronoun', 'personal', '-c', 2], done)
+          Then -> @output.split(reg).length.should.eql 2
 
     describe '.preposition', ->
-      When (done) -> @capture(['preposition'], done)
-      And -> @prepositions = @reduce 'preposition'
-      Then -> @output.should.be.oneOf @prepositions
+      context 'no options', ->
+        When (done) -> @capture(['preposition'], done)
+        And -> @prepositions = @reduce 'preposition'
+        Then -> @output.should.be.oneOf @prepositions
+
+      context 'with a count', ->
+        When (done) -> @capture(['preposition', '-c', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe '.conjunction', ->
       context 'with no subtype', ->
-        When (done) -> @capture(['conjunction'], done)
-        And -> @conjunctions = @reduce 'conjunction'
-        Then -> @output.should.be.oneOf @conjunctions
+        context 'no options', ->
+          When (done) -> @capture(['conjunction'], done)
+          And -> @conjunctions = @reduce 'conjunction'
+          Then -> @output.should.be.oneOf @conjunctions
+
+        context 'with a count', ->
+          When (done) -> @capture(['conjunction', '-c', 2], done)
+          Then -> @output.split(reg).length.should.eql 2
 
       context 'with a subtype', ->
-        When (done) -> @capture(['conjunction', 'correlative'], done)
-        And -> @conjunctions = @reduce 'conjunction', 'correlative'
-        Then -> @output.should.be.oneOf @conjunctions
+        context 'no options', ->
+          When (done) -> @capture(['conjunction', 'correlative'], done)
+          And -> @conjunctions = @reduce 'conjunction', 'correlative'
+          Then -> @output.should.be.oneOf @conjunctions
+
+        context 'with a count', ->
+          When (done) -> @capture(['conjunction', 'correlative', '-c', 2], done)
+          Then -> @output.split(reg).length.should.eql 2
 
     describe '.interjection', ->
-      When (done) -> @capture(['interjection'], done)
-      And -> @interjections = @reduce 'interjection'
-      Then -> @output.should.be.oneOf @interjections
+      context 'no options', ->
+        When (done) -> @capture(['interjection'], done)
+        And -> @interjections = @reduce 'interjection'
+        Then -> @output.should.be.oneOf @interjections
+
+      context 'with a count', ->
+        When (done) -> @capture(['interjection', '-c', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe '.article', ->
-      When (done) -> @capture(['article'], done)
-      And -> @articles = @reduce 'article'
-      Then -> @output.should.be.oneOf @articles
+      context 'no options', ->
+        When (done) -> @capture(['article'], done)
+        And -> @articles = @reduce 'article'
+        Then -> @output.should.be.oneOf @articles
+
+      context 'with a count', ->
+        When (done) -> @capture(['article', '-c', 2], done)
+        Then -> @output.split(reg).length.should.eql 2
 
     describe 'with no specific command', ->
       context 'with interpolation', ->
-        When (done) -> @capture(["The {{ noun }}"], done)
-        And -> @nouns = @reduce 'noun'
-        Then ->
-          @output.should.match /The [a-z]+/
-          @output.replace('The ', '').should.be.oneOf @nouns
+        context 'no options', ->
+          When (done) -> @capture(["The {{ noun }}"], done)
+          And -> @nouns = @reduce 'noun'
+          Then ->
+            @output.should.match /The [a-z]+/
+            @output.replace('The ', '').should.be.oneOf @nouns
+
+        context 'with a count', ->
+          When (done) -> @capture(["The {{ noun }}", '-c', 2], done)
+          Then -> @output.split(reg).length.should.eql 2
 
       context 'with no interpolation', ->
         When (done) -> @capture(["blah"], done)

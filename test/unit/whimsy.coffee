@@ -132,6 +132,7 @@ describe 'whimsy', ->
   describe '.generate', ->
     afterEach -> @subject.get.restore()
     Given -> sinon.stub(@subject, 'get')
+    Given -> @subject.generated = []
 
     context 'as a literal array', ->
       Given -> @lists.banana = ['foo', 'bar', 'foo']
@@ -172,6 +173,13 @@ describe 'whimsy', ->
         @filters.blah.should.have.been.calledWith('banana', ['foo', 'bar'])
         @result.should.be.an.instanceof Array
         @result.length.should.eql 2
+
+    context 'should not return duplicates', ->
+      Given -> @lists.banana = ['foo', 'bar']
+      Given -> @subject.generated =
+        banana: ['foo']
+      Given -> @subject.get.withArgs(['bar']).returns 'bar'
+      Then -> @subject.generate('banana').should.eql 'bar'
 
   describe '.get', ->
     afterEach -> _.random.restore()

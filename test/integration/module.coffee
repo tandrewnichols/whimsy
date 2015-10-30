@@ -104,6 +104,8 @@ describe 'whimsy required as a module', ->
         @generated.length.should.eql 2
     
   describe 'called as a function', ->
+    Given -> @subject.generated = []
+
     context 'no duplicates', ->
       Given -> @parts = @subject('{{ adjective }}-{{ noun }}').split '-'
       Then -> @parts[0].should.be.oneOf @words.adjective

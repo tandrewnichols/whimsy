@@ -34,6 +34,7 @@
   "homepage": "https://github.com/tandrewnichols/whimsy",
   "dependencies": {
     "commander": "^2.8.1",
+    "conjugate": "^1.0.0",
     "indefinite": "^1.0.0",
     "lodash": "^3.10.1",
     "pluralize": "^1.2.1",

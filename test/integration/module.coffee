@@ -1,7 +1,6 @@
 sinon = require 'sinon'
 _ = require 'lodash'
 words = require '../../lib/words'
-clear = require 'clear-require'
 
 describe 'whimsy required as a module', ->
   Given -> @words = words.get()

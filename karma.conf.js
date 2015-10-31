@@ -10,7 +10,7 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha'],
+    frameworks: ['browserify', 'mocha'],
 
 
     // list of files / patterns to load in the browser
@@ -19,7 +19,7 @@ module.exports = function(config) {
       'node_modules/should/should.js',
       'dist/whimsy.js',
       'test/helpers/**/*.js',
-      'test/**/*.coffee'
+      'test/integration/module.coffee'
     ],
 
 
@@ -31,9 +31,12 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      '**/*.coffee': ['coffee']
+      'test/integration/module.coffee': ['browserify']
     },
 
+    browserify: {
+      transform: ['coffeeify']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'

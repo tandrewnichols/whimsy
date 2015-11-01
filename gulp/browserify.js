@@ -5,10 +5,11 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 
 gulp.task('browserify', function() {
-  browserify('./' + pkg.main, {
+  var b = browserify('./' + pkg.main, {
     standalone: 'whimsy' 
-  })
-    .bundle()
+  });
+  b.ignore('lapack');
+  b.bundle()
     .pipe(source('whimsy.js'))
     .pipe(buffer())
     .pipe(gulp.dest('dist'));

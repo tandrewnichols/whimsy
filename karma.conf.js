@@ -35,7 +35,12 @@ module.exports = function(config) {
     },
 
     browserify: {
-      transform: ['coffeeify']
+      transform: ['coffeeify'],
+      configure: function(bundle) {
+        bundle.on('prebundle', function() {
+          bundle.ignore('lapack');
+        });
+      }
     },
 
     // test results reporter to use

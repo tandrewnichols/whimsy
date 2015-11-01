@@ -78,7 +78,6 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "optionalDependencies": {
-    "WNdb": "^3.1.1",
-    "lapack": "^0.1.0"
+    "WNdb": "^3.1.1"
   }
 }

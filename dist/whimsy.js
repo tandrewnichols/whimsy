@@ -92,7 +92,7 @@ exports.saveAs = function(key, val) {
   return val;
 };
 
-},{"conjugate":19,"lodash":42,"pluralize":43,"tensify":138}],2:[function(require,module,exports){
+},{"conjugate":17,"lodash":18,"pluralize":19,"tensify":114}],2:[function(require,module,exports){
 module.exports={
   "noun": "fire, sheet, prophecy, biscuit, burger, alley, doll, engine, chicanery, melancholy, leprousy, nugat, pejorative, ghome, underpants, mercenary, cougar, villain, decision, parsonage, diatribe, fisticuffs, parody, comeuppance, curmudgeon, duck, swan, mayhem, dignitary, fjord, diamond, wit, allegory, treason, villainy, enigma, debauchery, foible, hodgepodge, hullabaloo, kerfuffle, malarkey, opus, squirrel, skunk, skink, lemur, rigmarole, regiment, ruckus, scalawag, pirate, pilates, shenanigans, subterfuge, rotary, rosary, sphinx, nephew, niece, pyramid, castle, drawbridge, toaster, mage, wizard, hat, trunk, spell, leaf",
   "verb": "finagle, swoon, mock, flummox, hornswoggle, lollygag, swindle, remit, verify, validate, denote, delineate, obfuscate, obviate, prognosticate, matriculate, masticate, squelch, quench, sate, satiate, genuflect, open, destroy, modify, reject, resolve",
@@ -258,7 +258,7 @@ _.each(lists, function(val, key) {
   }
 });
 
-},{"./filters":1,"./words":4,"lodash":42}],4:[function(require,module,exports){
+},{"./filters":1,"./words":4,"lodash":18}],4:[function(require,module,exports){
 var _ = require('lodash');
 var lists = require('./parts-of-speech');
 
@@ -295,7 +295,7 @@ exports.stringify = function(obj) {
   return JSON.stringify(obj, null, 2);
 };
 
-},{"./parts-of-speech":2,"lodash":42}],5:[function(require,module,exports){
+},{"./parts-of-speech":2,"lodash":18}],5:[function(require,module,exports){
 (function (__dirname){
 
 exports.version = "3.1";	// this is the WordNet DB version
@@ -303,370 +303,9 @@ exports.path = require('path').join(__dirname, "dict");
 exports.files = require('fs').readdirSync(exports.path);
 
 }).call(this,"/node_modules/WNdb")
-},{"fs":6,"path":15}],6:[function(require,module,exports){
+},{"fs":6,"path":13}],6:[function(require,module,exports){
 
 },{}],7:[function(require,module,exports){
-// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
-//
-// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
-//
-// Originally from narwhal.js (http://narwhaljs.org)
-// Copyright (c) 2009 Thomas Robinson <280north.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the 'Software'), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// when used in node, this will actually load the util module we depend on
-// versus loading the builtin util module as happens otherwise
-// this is a bug in node module loading as far as I am concerned
-var util = require('util/');
-
-var pSlice = Array.prototype.slice;
-var hasOwn = Object.prototype.hasOwnProperty;
-
-// 1. The assert module provides functions that throw
-// AssertionError's when particular conditions are not met. The
-// assert module must conform to the following interface.
-
-var assert = module.exports = ok;
-
-// 2. The AssertionError is defined in assert.
-// new assert.AssertionError({ message: message,
-//                             actual: actual,
-//                             expected: expected })
-
-assert.AssertionError = function AssertionError(options) {
-  this.name = 'AssertionError';
-  this.actual = options.actual;
-  this.expected = options.expected;
-  this.operator = options.operator;
-  if (options.message) {
-    this.message = options.message;
-    this.generatedMessage = false;
-  } else {
-    this.message = getMessage(this);
-    this.generatedMessage = true;
-  }
-  var stackStartFunction = options.stackStartFunction || fail;
-
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, stackStartFunction);
-  }
-  else {
-    // non v8 browsers so we can have a stacktrace
-    var err = new Error();
-    if (err.stack) {
-      var out = err.stack;
-
-      // try to strip useless frames
-      var fn_name = stackStartFunction.name;
-      var idx = out.indexOf('\n' + fn_name);
-      if (idx >= 0) {
-        // once we have located the function frame
-        // we need to strip out everything before it (and its line)
-        var next_line = out.indexOf('\n', idx + 1);
-        out = out.substring(next_line + 1);
-      }
-
-      this.stack = out;
-    }
-  }
-};
-
-// assert.AssertionError instanceof Error
-util.inherits(assert.AssertionError, Error);
-
-function replacer(key, value) {
-  if (util.isUndefined(value)) {
-    return '' + value;
-  }
-  if (util.isNumber(value) && !isFinite(value)) {
-    return value.toString();
-  }
-  if (util.isFunction(value) || util.isRegExp(value)) {
-    return value.toString();
-  }
-  return value;
-}
-
-function truncate(s, n) {
-  if (util.isString(s)) {
-    return s.length < n ? s : s.slice(0, n);
-  } else {
-    return s;
-  }
-}
-
-function getMessage(self) {
-  return truncate(JSON.stringify(self.actual, replacer), 128) + ' ' +
-         self.operator + ' ' +
-         truncate(JSON.stringify(self.expected, replacer), 128);
-}
-
-// At present only the three keys mentioned above are used and
-// understood by the spec. Implementations or sub modules can pass
-// other keys to the AssertionError's constructor - they will be
-// ignored.
-
-// 3. All of the following functions must throw an AssertionError
-// when a corresponding condition is not met, with a message that
-// may be undefined if not provided.  All assertion methods provide
-// both the actual and expected values to the assertion error for
-// display purposes.
-
-function fail(actual, expected, message, operator, stackStartFunction) {
-  throw new assert.AssertionError({
-    message: message,
-    actual: actual,
-    expected: expected,
-    operator: operator,
-    stackStartFunction: stackStartFunction
-  });
-}
-
-// EXTENSION! allows for well behaved errors defined elsewhere.
-assert.fail = fail;
-
-// 4. Pure assertion tests whether a value is truthy, as determined
-// by !!guard.
-// assert.ok(guard, message_opt);
-// This statement is equivalent to assert.equal(true, !!guard,
-// message_opt);. To test strictly for the value true, use
-// assert.strictEqual(true, guard, message_opt);.
-
-function ok(value, message) {
-  if (!value) fail(value, true, message, '==', assert.ok);
-}
-assert.ok = ok;
-
-// 5. The equality assertion tests shallow, coercive equality with
-// ==.
-// assert.equal(actual, expected, message_opt);
-
-assert.equal = function equal(actual, expected, message) {
-  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
-};
-
-// 6. The non-equality assertion tests for whether two objects are not equal
-// with != assert.notEqual(actual, expected, message_opt);
-
-assert.notEqual = function notEqual(actual, expected, message) {
-  if (actual == expected) {
-    fail(actual, expected, message, '!=', assert.notEqual);
-  }
-};
-
-// 7. The equivalence assertion tests a deep equality relation.
-// assert.deepEqual(actual, expected, message_opt);
-
-assert.deepEqual = function deepEqual(actual, expected, message) {
-  if (!_deepEqual(actual, expected)) {
-    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
-  }
-};
-
-function _deepEqual(actual, expected) {
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
-
-  } else if (util.isBuffer(actual) && util.isBuffer(expected)) {
-    if (actual.length != expected.length) return false;
-
-    for (var i = 0; i < actual.length; i++) {
-      if (actual[i] !== expected[i]) return false;
-    }
-
-    return true;
-
-  // 7.2. If the expected value is a Date object, the actual value is
-  // equivalent if it is also a Date object that refers to the same time.
-  } else if (util.isDate(actual) && util.isDate(expected)) {
-    return actual.getTime() === expected.getTime();
-
-  // 7.3 If the expected value is a RegExp object, the actual value is
-  // equivalent if it is also a RegExp object with the same source and
-  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
-  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-    return actual.source === expected.source &&
-           actual.global === expected.global &&
-           actual.multiline === expected.multiline &&
-           actual.lastIndex === expected.lastIndex &&
-           actual.ignoreCase === expected.ignoreCase;
-
-  // 7.4. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if (!util.isObject(actual) && !util.isObject(expected)) {
-    return actual == expected;
-
-  // 7.5 For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else {
-    return objEquiv(actual, expected);
-  }
-}
-
-function isArguments(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-}
-
-function objEquiv(a, b) {
-  if (util.isNullOrUndefined(a) || util.isNullOrUndefined(b))
-    return false;
-  // an identical 'prototype' property.
-  if (a.prototype !== b.prototype) return false;
-  // if one is a primitive, the other must be same
-  if (util.isPrimitive(a) || util.isPrimitive(b)) {
-    return a === b;
-  }
-  var aIsArgs = isArguments(a),
-      bIsArgs = isArguments(b);
-  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
-    return false;
-  if (aIsArgs) {
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return _deepEqual(a, b);
-  }
-  var ka = objectKeys(a),
-      kb = objectKeys(b),
-      key, i;
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length != kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] != kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!_deepEqual(a[key], b[key])) return false;
-  }
-  return true;
-}
-
-// 8. The non-equivalence assertion tests for any deep inequality.
-// assert.notDeepEqual(actual, expected, message_opt);
-
-assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
-  if (_deepEqual(actual, expected)) {
-    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
-  }
-};
-
-// 9. The strict equality assertion tests strict equality, as determined by ===.
-// assert.strictEqual(actual, expected, message_opt);
-
-assert.strictEqual = function strictEqual(actual, expected, message) {
-  if (actual !== expected) {
-    fail(actual, expected, message, '===', assert.strictEqual);
-  }
-};
-
-// 10. The strict non-equality assertion tests for strict inequality, as
-// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
-
-assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
-  if (actual === expected) {
-    fail(actual, expected, message, '!==', assert.notStrictEqual);
-  }
-};
-
-function expectedException(actual, expected) {
-  if (!actual || !expected) {
-    return false;
-  }
-
-  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
-    return expected.test(actual);
-  } else if (actual instanceof expected) {
-    return true;
-  } else if (expected.call({}, actual) === true) {
-    return true;
-  }
-
-  return false;
-}
-
-function _throws(shouldThrow, block, expected, message) {
-  var actual;
-
-  if (util.isString(expected)) {
-    message = expected;
-    expected = null;
-  }
-
-  try {
-    block();
-  } catch (e) {
-    actual = e;
-  }
-
-  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
-            (message ? ' ' + message : '.');
-
-  if (shouldThrow && !actual) {
-    fail(actual, expected, 'Missing expected exception' + message);
-  }
-
-  if (!shouldThrow && expectedException(actual, expected)) {
-    fail(actual, expected, 'Got unwanted exception' + message);
-  }
-
-  if ((shouldThrow && actual && expected &&
-      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
-    throw actual;
-  }
-}
-
-// 11. Expected to throw an error:
-// assert.throws(block, Error_opt, message_opt);
-
-assert.throws = function(block, /*optional*/error, /*optional*/message) {
-  _throws.apply(this, [true].concat(pSlice.call(arguments)));
-};
-
-// EXTENSION! This is annoying to write outside this module.
-assert.doesNotThrow = function(block, /*optional*/message) {
-  _throws.apply(this, [false].concat(pSlice.call(arguments)));
-};
-
-assert.ifError = function(err) { if (err) {throw err;}};
-
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    if (hasOwn.call(obj, key)) keys.push(key);
-  }
-  return keys;
-};
-
-},{"util/":18}],8:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2214,7 +1853,7 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":9,"ieee754":10,"is-array":11}],9:[function(require,module,exports){
+},{"base64-js":8,"ieee754":9,"is-array":10}],8:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -2340,7 +1979,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -2426,7 +2065,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 
 /**
  * isArray
@@ -2461,7 +2100,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2761,7 +2400,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2786,26 +2425,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],14:[function(require,module,exports){
-/**
- * Determine if an object is Buffer
- *
- * Author:   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * License:  MIT
- *
- * `npm install is-buffer`
- */
-
-module.exports = function (obj) {
-  return !!(obj != null &&
-    (obj._isBuffer || // For Safari 5-7 (missing Object.prototype.constructor)
-      (obj.constructor &&
-      typeof obj.constructor.isBuffer === 'function' &&
-      obj.constructor.isBuffer(obj))
-    ))
-}
-
-},{}],15:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3033,7 +2653,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":16}],16:[function(require,module,exports){
+},{"_process":14}],14:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -3126,14 +2746,14 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],17:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],18:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -3723,7 +3343,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":17,"_process":16,"inherits":13}],19:[function(require,module,exports){
+},{"./support/isBuffer":15,"_process":14,"inherits":12}],17:[function(require,module,exports){
 (function() {
   var isNode = typeof module !== 'undefined' && this.module !== module;
 
@@ -3803,4027 +3423,7 @@ function hasOwnProperty(obj, prop) {
   }
 })();
 
-},{}],20:[function(require,module,exports){
-(function (Buffer){
-/*
-Copyright (c) 2011, Chris Umbel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
-var FFI = require('ffi');
-
-function fortranArrayToJSMatrix(fortranArray, m, n, elementSize) {
-    var op = elementSize == 8 ? 'readDoubleLE' : 'readFloatLE';
-    var array = [];
-    var rowWidth = elementSize * n;
-    var columnOffset = m * elementSize;
-
-    for(var i = 0; i < m; i++) {
-        var row = [];
-        var rowStart = i * elementSize;
-
-        for(var j = 0; j < n; j++) {
-            row.push(fortranArray[op](columnOffset * j + rowStart));
-        }
-
-        array.push(row);
-    }
-
-    return array;
-}
-
-function jsMatrixToFortranArray(array, elementSize) {
-    var op = elementSize == 8 ? 'writeDoubleLE' : 'writeFloatLE';
-    var m = array.length;
-    var n = array[0].length;
-    var fortranArrayStart = fortranArray = new Buffer(m * n * elementSize);
-    for(var j = 0; j < n; j++) {
-        for(var i = 0; i < m; i++) {
-            fortranArray[op](array[i][j], elementSize * (j * m + i));
-        }
-    }
-
-    return fortranArrayStart;
-}
-
-function fortranArrayToJSArray(fortranArray, n, op, elementSize) {
-    var array = [];
-    
-    for(var i = 0; i < n; i++) {
-        array.push(fortranArray[op](i * elementSize));
-    }
-
-    return array;
-}
-
-module.exports.fortranArrayToJSMatrix = fortranArrayToJSMatrix;
-module.exports.jsMatrixToFortranArray = jsMatrixToFortranArray;
-module.exports.fortranArrayToJSArray = fortranArrayToJSArray;
-
-}).call(this,require("buffer").Buffer)
-},{"buffer":8,"ffi":30}],21:[function(require,module,exports){
-/*
-Copyright (c) 2011, Chris Umbel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
-var lapack = require('./lapack.js');
-exports.sgeqrf = lapack.sgeqrf;
-exports.dgeqrf = lapack.dgeqrf;
-exports.sgesvd = lapack.sgesvd;
-exports.qr = lapack.qr;
-exports.lu = lapack.lu;
-exports.sgetrf = lapack.sgetrf;
-exports.sgesv = lapack.sgesv;
-
-},{"./lapack.js":22}],22:[function(require,module,exports){
-(function (Buffer){
-/*
-Copyright (c) 2011, Chris Umbel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
-var fortranArray = require('./fortranArray');
-var FFI = require('ffi');
-
-var LAPACK;
-
-try {
-    LAPACK = new FFI.Library('liblapack', {
-	"sgeqrf_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", 
-			    "pointer", "pointer", "pointer"]],
-	"dgeqrf_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", 
-			    "pointer", "pointer", "pointer"]],
-	"sorgqr_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", "pointer", 
-			    "pointer", "pointer", "pointer"]],
-	"sgesvd_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", 
-			    "pointer", "pointer", "pointer", "pointer", "pointer", 
-			    "pointer", "pointer", "pointer", "pointer", ]],
-	"sgetrf_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", "pointer"]],
-	"dgetrf_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", "pointer"]],
-	"sgesv_": ["void", ["pointer", "pointer", "pointer", "pointer", "pointer", "pointer", "pointer", "pointer"]]
-	
-    });
-} catch(e) {
-    console.log("!!! node-lapack requires the native lapack to be built as a shared lib.");
-    console.log(e);
-}
-
-var FORTRAN_INT = 4;
-var FORTRAN_CHAR = 1;
-var FORTRAN_FLOAT = 4;
-var FORTRAN_DOUBLE = 8;
-
-function eye(m) {
-    var matrix = [];
-
-    for(var i = 0; i < m; i++) {
-	var row = [];
-	matrix.push(row);
-	
-	for(var j = 0; j < m; j++) {
-	    if(i == j)
-		row.push(1);
-	    else
-		row.push(0);
-	}
-    }
-
-    return matrix;
-}
-
-function matrixOp(matrix, elementSize, callback) {
-    var m = matrix.length;
-    var n = matrix[0].length;    
-    var f_m = new Buffer(FORTRAN_INT);
-    var f_n = new Buffer(FORTRAN_INT);
-    var f_a = fortranArray.jsMatrixToFortranArray(matrix, elementSize);
-    var f_lda = new Buffer(FORTRAN_INT);
-    
-    f_m.writeInt32LE(m, 0);
-    f_n.writeInt32LE(n, 0);
-    f_lda.writeInt32LE(Math.max(1, m), 0);
-    
-    callback(m, n, f_m, f_n, f_a, f_lda);
-}
-
-function zeroBottomLeft(matrix) {
-    // zero out bottom left forming an upper right triangle matrix                
-    for(var i = 1; i < matrix.length; i++) {
-        for(var j = 0; j < i && j < matrix[0].length; j++)
-            matrix[i][j] = 0;
-    }
-
-    return matrix
-}
-
-function sgesv(a, b) {
-    var f_info = new Buffer(FORTRAN_INT);
-    var result = {};
-
-    matrixOp(a, FORTRAN_FLOAT, function(am, an, af_m, af_n, f_a) {
-	var f_ipiv = new Buffer(am  * FORTRAN_INT);
-
-	matrixOp(b, FORTRAN_FLOAT, function(bm, bn, bf_m, bf_n, f_b) {
-	    LAPACK.sgesv_(af_m, bf_n, f_a, af_n, f_ipiv, f_b, bf_m, f_info);
-	    result.X = fortranArray.fortranArrayToJSMatrix(f_b, bm, bn, FORTRAN_FLOAT);
-	    result.P = ipivToP(bm, fortranArray.fortranArrayToJSArray(f_ipiv, bm, 'readInt32LE', FORTRAN_FLOAT));
-	});
-    });
-
-    return result;
-}
-
-function qr(matrix) {
-    var result;
-
-    sgeqrf(matrix, function(qr, m, n, f_m, f_n, f_a, f_lda, f_tau, f_work, f_lwork, f_info) {
-	var f_k = new Buffer(FORTRAN_INT);
-	f_k.writeInt32LE(Math.min(m, n), 0);
-	LAPACK.sorgqr_(f_m, f_n, f_k, f_a, f_lda, f_tau, f_work, f_lwork, f_info);
-	qr.Q = fortranArray.fortranArrayToJSMatrix(f_a, m, n, FORTRAN_FLOAT);
-	qr.R = zeroBottomLeft(qr.R);
-	result = qr;
-    });
-    
-    return result;
-}
-
-function sgeqrf(matrix, callback) {
-    return geqrf(matrix, 'readFloatLE', LAPACK.sgeqrf_, FORTRAN_FLOAT, callback);
-}
-
-function dgeqrf(matrix, callback) {
-    return geqrf(matrix, 'readDoubleLE', LAPACK.dgeqrf_, FORTRAN_DOUBLE, callback);
-}
-
-function geqrf(matrix, op, lapackFunc, elementSize, callback) {
-    var qr;
-    
-    matrixOp(matrix, elementSize, function(m, n, f_m, f_n, f_a, f_lda) {
-	var f_tau = new Buffer(m * n * elementSize);
-	var f_info = new Buffer(FORTRAN_INT);
-	var f_lwork = new Buffer(FORTRAN_INT);
-	var f_work;
-	f_lwork.writeInt32LE(-1, 0);
-	
-	// get optimal size of workspace
-	f_work = new Buffer(FORTRAN_DOUBLE);
-	lapackFunc(f_m, f_n, f_a, f_lda, f_tau, f_work, f_lwork, f_info);
-	lwork = f_work[op](0);
-	
-	// allocate workspace
-	f_work = new Buffer(lwork * elementSize);
-	f_lwork.writeInt32LE(lwork, 0);
-	
-	// perform QR decomp
-	lapackFunc(f_m, f_n, f_a, f_lda, f_tau, f_work, f_lwork, f_info); 
-	
-	qr = {
-	    R: fortranArray.fortranArrayToJSMatrix(f_a, m, n, elementSize),
-	    tau: fortranArray.fortranArrayToJSArray(f_tau, Math.min(m, n), op, elementSize)
-	};
-	
-	if(callback)
-	    qr = callback(qr, m, n, f_m, f_n, f_a, f_lda, f_tau, f_work, f_lwork, f_info);
-    });
-    
-    return qr;
-}
-
-function cloneMatrix(matrix, height, width) {
-    var clone = [];
-
-    height = height || matrix.length;
-    width = width || matrix[0].length;
-
-    for(var i = 0; i < height; i++) {
-	var row = [];
-	clone.push(row);
-
-	for(var j = 0; j < width; j++) {
-	    row.push(matrix[i][j]);
-	}
-    }
-
-    return clone;
-}
-
-function swapRows(matrix, i, j) {
-    var tmp = matrix[j];
-    matrix[j] = matrix[i];
-    matrix[i] = tmp;
-    return matrix;
-}
-
-function lu(matrix) {
-    var result = sgetrf(matrix);
-    var P = ipivToP(matrix.length, result.IPIV);
-    var L = cloneMatrix(result.LU);
-    var m = n = Math.min(matrix.length, matrix[0].length);
-
-    for(var i = 0; i < L.length; i++) {
-	for(var j = i; j < L[i].length; j++) {
-	    if(i == j)
-		L[i][j] = 1;
-	    else
-		L[i][j] = 0;
-	}
-    }
-
-    return {
-	L: L,
-	U: zeroBottomLeft(cloneMatrix(result.LU, n, n)),
-	P: P,
-	IPIV: result.IPIV
-    };
-}
-
-function ipivToP(m, ipiv){
-    var P = eye(m);
-
-    for(var i = 0; i < ipiv.length; i++) {
-	if(i != ipiv[i] - 1)
-            swapRows(P, i, ipiv[i] - 1);
-    }
-
-    return P;
-}
-
-function sgetrf(matrix) {
-    return getrf(matrix, LAPACK.sgetrf_, FORTRAN_FLOAT);
-}
-
-function dgetrf(matrix) {
-    return getrf(matrix, LAPACK.dgetrf_, FORTRAN_DOUBLE);
-}
-
-function getrf(matrix, lapackFunc, elementSize) {
-    var result = {};
-
-    matrixOp(matrix, elementSize, function(m, n, f_m, f_n, f_a, f_lda) {
-	var f_ipiv = new Buffer(Math.min(m, n) * FORTRAN_INT);
-	var f_info = new Buffer(FORTRAN_INT);
-	lapackFunc(f_m, f_n, f_a, f_m, f_ipiv, f_info);
-	result.LU = fortranArray.fortranArrayToJSMatrix(f_a, m, n, elementSize);
-	result.IPIV = fortranArray.fortranArrayToJSArray(f_ipiv, Math.min(m, n), 'readInt32LE', elementSize);
-    });
-
-    return result;
-}
-
-function sgesvd(jobu, jobvt, matrix) {
-    var f_jobu = new Buffer(FORTRAN_CHAR);
-    var f_jobvt = new Buffer(FORTRAN_CHAR);
-    f_jobu.writeUInt8(jobu.charCodeAt(0), 0);
-    f_jobvt.writeUInt8(jobvt.charCodeAt(0), 0);
-    var svd;
-
-    matrixOp(matrix, FORTRAN_FLOAT, function(m, n, f_m, f_n, f_a, f_lda) {
-	var f_s = new Buffer(Math.pow(Math.min(m, n), 2) * FORTRAN_FLOAT);
-	var f_u = new Buffer(Math.pow(m, 2) * FORTRAN_FLOAT);
-	var f_ldu = new Buffer(FORTRAN_INT);
-	f_ldu.writeInt32LE(m, 0);
-
-	// TODO: punting on dims for now. revisit with http://www.netlib.org/lapack/single/sgesvd.f
-	var f_vt = new Buffer(Math.pow(n, 2) * FORTRAN_FLOAT);
-	var f_ldvt = new Buffer(FORTRAN_INT);
-	f_ldvt.writeInt32LE(n, 0);
-	
-	var lwork = -1;
-	var f_work = new Buffer(FORTRAN_FLOAT);
-	var f_lwork = new Buffer(FORTRAN_INT);
-	f_lwork.writeInt32LE(lwork, 0);
-	var f_info = new Buffer(FORTRAN_INT);
-
-	LAPACK.sgesvd_(f_jobu, f_jobvt, f_m, f_n, f_a, f_lda, f_s, f_u, f_ldu, f_vt, f_ldvt, 
-		      f_work, f_lwork, f_info);
-
-	lwork = f_work.readFloatLE(0);
-	f_work = new Buffer(lwork * FORTRAN_FLOAT);
-	f_lwork.writeInt32LE(lwork, 0);
-
-	LAPACK.sgesvd_(f_jobu, f_jobvt, f_m, f_n, f_a, f_lda, f_s, f_u, f_ldu, f_vt, f_ldvt, 
-		      f_work, f_lwork, f_info);
-
-	svd = {
-	    U: fortranArray.fortranArrayToJSMatrix(f_u, m, m, FORTRAN_FLOAT),
-	    S: fortranArray.fortranArrayToJSMatrix(f_s, n, n, FORTRAN_FLOAT),
-	    VT: fortranArray.fortranArrayToJSMatrix(f_vt, n, n, FORTRAN_FLOAT)
-	};
-    });
-
-    return svd;
-}
-
-exports.sgeqrf = sgeqrf;
-exports.dgeqrf = dgeqrf;
-exports.sgesvd = sgesvd;
-exports.sgetrf = sgetrf;
-exports.dgetrf = sgetrf;
-exports.sgesv = sgesv;
-exports.qr = qr;
-exports.lu = lu;
-
-}).call(this,require("buffer").Buffer)
-},{"./fortranArray":20,"buffer":8,"ffi":30}],23:[function(require,module,exports){
-(function (process,Buffer){
-
-/**
- * Module dependencies.
- */
-
-var assert = require('assert')
-  , debug = require('debug')('ffi:_ForeignFunction')
-  , ref = require('ref')
-  , bindings = require('./bindings')
-  , POINTER_SIZE = ref.sizeof.pointer
-  , FFI_ARG_SIZE = bindings.FFI_ARG_SIZE
-
-
-function ForeignFunction (cif, funcPtr, returnType, argTypes) {
-  debug('creating new ForeignFunction', funcPtr)
-
-  var numArgs = argTypes.length
-  var argsArraySize = numArgs * POINTER_SIZE
-
-  // "result" must point to storage that is sizeof(long) or larger. For smaller
-  // return value sizes, the ffi_arg or ffi_sarg integral type must be used to
-  // hold the return value
-  var resultSize = returnType.size >= ref.sizeof.long ? returnType.size : FFI_ARG_SIZE
-  assert(resultSize > 0)
-
-  /**
-   * This is the actual JS function that gets returned.
-   * It handles marshalling input arguments into C values,
-   * and unmarshalling the return value back into a JS value
-   */
-
-  var proxy = function () {
-    debug('invoking proxy function')
-
-    if (arguments.length !== numArgs) {
-      throw new TypeError('Expected ' + numArgs +
-          ' arguments, got ' + arguments.length)
-    }
-
-    // storage buffers for input arguments and the return value
-    var result = new Buffer(resultSize)
-      , argsList = new Buffer(argsArraySize)
-
-    // write arguments to storage areas
-    var i, argType, val, valPtr
-    try {
-      for (i = 0; i < numArgs; i++) {
-        argType = argTypes[i]
-        val = arguments[i]
-        valPtr = ref.alloc(argType, val)
-        argsList.writePointer(valPtr, i * POINTER_SIZE)
-      }
-    } catch (e) {
-      e.message = 'error setting argument ' + i + ' - ' + e.message
-      throw e
-    }
-
-    // invoke the `ffi_call()` function
-    bindings.ffi_call(cif, funcPtr, result, argsList)
-
-    result.type = returnType
-    return result.deref()
-  }
-
-  /**
-   * The asynchronous version of the proxy function.
-   */
-
-  proxy.async = function () {
-    debug('invoking async proxy function')
-
-    var argc = arguments.length
-    if (argc !== numArgs + 1) {
-      throw new TypeError('Expected ' + (numArgs + 1) +
-          ' arguments, got ' + argc)
-    }
-
-    var callback = arguments[argc - 1]
-    if (typeof callback !== 'function') {
-      throw new TypeError('Expected a callback function as argument number: ' +
-          (argc - 1))
-    }
-
-    // storage buffers for input arguments and the return value
-    var result = new Buffer(resultSize)
-    var argsList = new Buffer(argsArraySize)
-
-    // write arguments to storage areas
-    var i, argType, val, valPtr
-    try {
-      for (i = 0; i < numArgs; i++) {
-        argType = argTypes[i]
-        val = arguments[i]
-        valPtr = ref.alloc(argType, val)
-        argsList.writePointer(valPtr, i * POINTER_SIZE)
-      }
-    } catch (e) {
-      e.message = 'error setting argument ' + i + ' - ' + e.message
-      return process.nextTick(callback.bind(null, e));
-    }
-
-    // invoke the `ffi_call()` function asynchronously
-    bindings.ffi_call_async(cif, funcPtr, result, argsList, function (err) {
-      // make sure that the 4 Buffers passed in above don't get GC'd while we're
-      // doing work on the thread pool...
-      cif = cif;
-      funcPtr = funcPtr;
-      argsList = argsList;
-
-      // now invoke the user-provided callback function
-      if (err) {
-        callback(err)
-      } else {
-        result.type = returnType
-        callback(null, result.deref())
-      }
-    })
-  }
-
-  return proxy
-}
-module.exports = ForeignFunction
-
-}).call(this,require('_process'),require("buffer").Buffer)
-},{"./bindings":24,"_process":16,"assert":7,"buffer":8,"debug":37,"ref":41}],24:[function(require,module,exports){
-
-module.exports = require('bindings')('ffi_bindings.node')
-
-},{"bindings":36}],25:[function(require,module,exports){
-(function (process){
-
-/**
- * Module dependencies.
- */
-
-var ref = require('ref')
-  , CIF = require('./cif')
-  , assert = require('assert')
-  , debug = require('debug')('ffi:Callback')
-  , _Callback = require('./bindings').Callback
-
-// Function used to report errors to the current process event loop,
-// When user callback function gets gced.
-function errorReportCallback (err) {
-  if (err) {
-    process.nextTick(function () {
-      if (typeof err === 'string') {
-        throw new Error(err)
-      } else {
-        throw err
-      }
-    })
-  }
-}
-
-/**
- * Turns a JavaScript function into a C function pointer.
- * The function pointer may be used in other C functions that
- * accept C callback functions.
- */
-
-function Callback (retType, argTypes, abi, func) {
-  debug('creating new Callback')
-
-  if (typeof abi === 'function') {
-    func = abi
-    abi = void(0)
-  }
-
-  // check args
-  assert(!!retType, 'expected a return "type" object as the first argument')
-  assert(Array.isArray(argTypes), 'expected Array of arg "type" objects as the second argument')
-  assert.equal(typeof func, 'function', 'expected a function as the third argument')
-
-  // normalize the "types" (they could be strings, so turn into real type
-  // instances)
-  retType = ref.coerceType(retType)
-  argTypes = argTypes.map(ref.coerceType)
-
-  // create the `ffi_cif *` instance
-  var cif = CIF(retType, argTypes, abi)
-  var argc = argTypes.length
-
-  var callback = _Callback(cif, retType.size, argc, errorReportCallback, function (retval, params) {
-    debug('Callback function being invoked')
-    try {
-      var args = []
-      for (var i = 0; i < argc; i++) {
-        var type = argTypes[ i ]
-        var argPtr = params.readPointer(i * ref.sizeof.pointer, type.size)
-        argPtr.type = type
-        args.push(argPtr.deref())
-      }
-
-      // Invoke the user-given function
-      var result = func.apply(null, args)
-      try {
-        ref.set(retval, 0, result, retType)
-      } catch (e) {
-        e.message = 'error setting return value - ' + e.message
-        throw e
-      }
-    } catch (e) {
-      return e
-    }
-  })
-
-  // store reference to the CIF Buffer so that it doesn't get
-  // garbage collected before the callback Buffer does
-  callback._cif = cif;
-
-  return callback
-}
-module.exports = Callback
-
-}).call(this,require('_process'))
-},{"./bindings":24,"./cif":26,"_process":16,"assert":7,"debug":37,"ref":41}],26:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var Type = require('./type')
-  , assert = require('assert')
-  , debug = require('debug')('ffi:cif')
-  , ref = require('ref')
-  , bindings = require('./bindings')
-  , POINTER_SIZE = ref.sizeof.pointer
-  , ffi_prep_cif = bindings.ffi_prep_cif
-  , FFI_CIF_SIZE = bindings.FFI_CIF_SIZE
-  , FFI_DEFAULT_ABI = bindings.FFI_DEFAULT_ABI
-  // status codes
-  , FFI_OK = bindings.FFI_OK
-  , FFI_BAD_TYPEDEF = bindings.FFI_BAD_TYPEDEF
-  , FFI_BAD_ABI = bindings.FFI_BAD_ABI
-
-/**
- * JS wrapper for the `ffi_prep_cif` function.
- * Returns a Buffer instance representing a `ffi_cif *` instance.
- */
-
-function CIF (rtype, types, abi) {
-  debug('creating `ffi_cif *` instance')
-
-  // the return and arg types are expected to be coerced at this point...
-  assert(!!rtype, 'expected a return "type" object as the first argument')
-  assert(Array.isArray(types), 'expected an Array of arg "type" objects as the second argument')
-
-  // the buffer that will contain the return `ffi_cif *` instance
-  var cif = new Buffer(FFI_CIF_SIZE)
-
-  var numArgs = types.length
-  var _argtypesptr = new Buffer(numArgs * POINTER_SIZE)
-  var _rtypeptr = Type(rtype)
-
-  for (var i = 0; i < numArgs; i++) {
-    var type = types[i]
-    var ffiType = Type(type)
-
-    _argtypesptr.writePointer(ffiType, i * POINTER_SIZE)
-  }
-
-  // prevent GC of the arg type and rtn type buffers (not sure if this is required)
-  cif.rtnTypePtr = _rtypeptr
-  cif.argTypesPtr = _argtypesptr
-
-  if (typeof abi === 'undefined') {
-    debug('no ABI specified (this is OK), using FFI_DEFAULT_ABI')
-    abi = FFI_DEFAULT_ABI
-  }
-
-  var status = ffi_prep_cif(cif, numArgs, _rtypeptr, _argtypesptr, abi)
-
-  if (status !== FFI_OK) {
-    switch (status) {
-      case FFI_BAD_TYPEDEF:
-        var err = new Error('ffi_prep_cif() returned an FFI_BAD_TYPEDEF error')
-        err.code = 'FFI_BAD_TYPEDEF'
-        err.errno = status
-        throw err
-        break;
-      case FFI_BAD_ABI:
-        var err = new Error('ffi_prep_cif() returned an FFI_BAD_ABI error')
-        err.code = 'FFI_BAD_ABI'
-        err.errno = status
-        throw err
-        break;
-      default:
-        throw new Error('ffi_prep_cif() returned an error: ' + status)
-        break;
-    }
-  }
-
-  return cif
-}
-module.exports = CIF
-
-}).call(this,require("buffer").Buffer)
-},{"./bindings":24,"./type":35,"assert":7,"buffer":8,"debug":37,"ref":41}],27:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var Type = require('./type')
-  , assert = require('assert')
-  , debug = require('debug')('ffi:cif_var')
-  , ref = require('ref')
-  , bindings = require('./bindings')
-  , POINTER_SIZE = ref.sizeof.pointer
-  , ffi_prep_cif_var = bindings.ffi_prep_cif_var
-  , FFI_CIF_SIZE = bindings.FFI_CIF_SIZE
-  , FFI_DEFAULT_ABI = bindings.FFI_DEFAULT_ABI
-  // status codes
-  , FFI_OK = bindings.FFI_OK
-  , FFI_BAD_TYPEDEF = bindings.FFI_BAD_TYPEDEF
-  , FFI_BAD_ABI = bindings.FFI_BAD_ABI
-
-/**
- * JS wrapper for the `ffi_prep_cif_var` function.
- * Returns a Buffer instance representing a variadic `ffi_cif *` instance.
- */
-
-function CIF_var (rtype, types, numFixedArgs, abi) {
-  debug('creating `ffi_cif *` instance with `ffi_prep_cif_var()`')
-
-  // the return and arg types are expected to be coerced at this point...
-  assert(!!rtype, 'expected a return "type" object as the first argument')
-  assert(Array.isArray(types), 'expected an Array of arg "type" objects as the second argument')
-  assert(numFixedArgs >= 1, 'expected the number of fixed arguments to be at least 1')
-
-  // the buffer that will contain the return `ffi_cif *` instance
-  var cif = new Buffer(FFI_CIF_SIZE)
-
-  var numTotalArgs = types.length
-  var _argtypesptr = new Buffer(numTotalArgs * POINTER_SIZE)
-  var _rtypeptr = Type(rtype)
-
-  for (var i = 0; i < numTotalArgs; i++) {
-    var ffiType = Type(types[i])
-    _argtypesptr.writePointer(ffiType, i * POINTER_SIZE)
-  }
-
-  // prevent GC of the arg type and rtn type buffers (not sure if this is required)
-  cif.rtnTypePtr = _rtypeptr
-  cif.argTypesPtr = _argtypesptr
-
-  if (typeof abi === 'undefined') {
-    debug('no ABI specified (this is OK), using FFI_DEFAULT_ABI')
-    abi = FFI_DEFAULT_ABI
-  }
-
-  var status = ffi_prep_cif_var(cif, numFixedArgs, numTotalArgs, _rtypeptr, _argtypesptr, abi)
-
-  if (status !== FFI_OK) {
-    switch (status) {
-      case FFI_BAD_TYPEDEF:
-        var err = new Error('ffi_prep_cif_var() returned an FFI_BAD_TYPEDEF error')
-        err.code = 'FFI_BAD_TYPEDEF'
-        err.errno = status
-        throw err
-        break;
-      case FFI_BAD_ABI:
-        var err = new Error('ffi_prep_cif_var() returned an FFI_BAD_ABI error')
-        err.code = 'FFI_BAD_ABI'
-        err.errno = status
-        throw err
-        break;
-      default:
-        var err = new Error('ffi_prep_cif_var() returned an error: ' + status)
-        err.errno = status
-        throw err
-        break;
-    }
-  }
-
-  return cif
-}
-module.exports = CIF_var
-
-}).call(this,require("buffer").Buffer)
-},{"./bindings":24,"./type":35,"assert":7,"buffer":8,"debug":37,"ref":41}],28:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var ForeignFunction = require('./foreign_function')
-  , assert = require('assert')
-  , debug = require('debug')('ffi:DynamicLibrary')
-  , bindings = require('./bindings')
-  , funcs = bindings.StaticFunctions
-  , ref = require('ref')
-  , read  = require('fs').readFileSync
-
-// typedefs
-var int = ref.types.int
-  , voidPtr = ref.refType(ref.types.void)
-
-var dlopen  = ForeignFunction(funcs.dlopen,  voidPtr, [ 'string', int ])
-  , dlclose = ForeignFunction(funcs.dlclose, int,     [ voidPtr ])
-  , dlsym   = ForeignFunction(funcs.dlsym,   voidPtr, [ voidPtr, 'string' ])
-  , dlerror = ForeignFunction(funcs.dlerror, 'string', [ ])
-
-/**
- * `DynamicLibrary` loads and fetches function pointers for dynamic libraries
- * (.so, .dylib, etc). After the libray's function pointer is acquired, then you
- * call `get(symbol)` to retreive a pointer to an exported symbol. You need to
- * call `get___()` on the pointer to dereference it into its actual value, or
- * turn the pointer into a callable function with `ForeignFunction`.
- */
-
-function DynamicLibrary (path, mode) {
-  if (!(this instanceof DynamicLibrary)) {
-    return new DynamicLibrary(path, mode)
-  }
-  debug('new DynamicLibrary()', path, mode)
-
-  if (null == mode) {
-    mode = DynamicLibrary.FLAGS.RTLD_LAZY
-  }
-
-  this._handle = dlopen(path, mode)
-  assert(Buffer.isBuffer(this._handle), 'expected a Buffer instance to be returned from `dlopen()`')
-
-  if (this._handle.isNull()) {
-    var err = this.error()
-
-    // THIS CODE IS BASED ON GHC Trac ticket #2615
-    // http://hackage.haskell.org/trac/ghc/attachment/ticket/2615
-
-    // On some systems (e.g., Gentoo Linux) dynamic files (e.g. libc.so)
-    // contain linker scripts rather than ELF-format object code. This
-    // code handles the situation by recognizing the real object code
-    // file name given in the linker script.
-
-    // If an "invalid ELF header" error occurs, it is assumed that the
-    // .so file contains a linker script instead of ELF object code.
-    // In this case, the code looks for the GROUP ( ... ) linker
-    // directive. If one is found, the first file name inside the
-    // parentheses is treated as the name of a dynamic library and the
-    // code attempts to dlopen that file. If this is also unsuccessful,
-    // an error message is returned.
-
-    // see if the error message is due to an invalid ELF header
-    var match
-
-    if (match = err.match(/^(([^ \t()])+\.so([^ \t:()])*):([ \t])*/)) {
-      var content = read(match[1], 'ascii')
-      // try to find a GROUP ( ... ) command
-      if (match = content.match(/GROUP *\( *(([^ )])+)/)){
-        return DynamicLibrary.call(this, match[1], mode)
-      }
-    }
-
-    throw new Error('Dynamic Linking Error: ' + err)
-  }
-}
-module.exports = DynamicLibrary
-
-/**
- * Set the exported flags from "dlfcn.h"
- */
-
-DynamicLibrary.FLAGS = {};
-Object.keys(bindings).forEach(function (k) {
-  if (!/^RTLD_/.test(k)) return;
-  var desc = Object.getOwnPropertyDescriptor(bindings, k)
-  Object.defineProperty(DynamicLibrary.FLAGS, k, desc)
-});
-
-
-/**
- * Close this library, returns the result of the dlclose() system function.
- */
-
-DynamicLibrary.prototype.close = function () {
-  debug('dlclose()')
-  return dlclose(this._handle)
-}
-
-/**
- * Get a symbol from this library, returns a Pointer for (memory address of) the symbol
- */
-
-DynamicLibrary.prototype.get = function (symbol) {
-  debug('dlsym()', symbol)
-  assert.equal('string', typeof symbol)
-
-  var ptr = dlsym(this._handle, symbol)
-  assert(Buffer.isBuffer(ptr))
-
-  if (ptr.isNull()) {
-    throw new Error('Dynamic Symbol Retrieval Error: ' + this.error())
-  }
-
-  ptr.name = symbol
-
-  return ptr
-}
-
-/**
- * Returns the result of the dlerror() system function
- */
-
-DynamicLibrary.prototype.error = function error () {
-  debug('dlerror()')
-  return dlerror()
-}
-
-}).call(this,{"isBuffer":require("../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":14,"./bindings":24,"./foreign_function":31,"assert":7,"debug":37,"fs":6,"ref":41}],29:[function(require,module,exports){
-(function (process){
-
-/**
- * Implementation of errno. This is a #define :/
- * On Linux, it's a global variable with the symbol `errno`,
- * On Darwin it's a method execution called `__error`.
- * On Windows it's a method execution called `_errno`.
- */
-
-/**
- * Module dependencies.
- */
-
-var DynamicLibrary = require('./dynamic_library')
-  , ForeignFunction = require('./foreign_function')
-  , ref = require('ref')
-  , errnoPtr = null
-  , int = ref.types.int
-  , intPtr = ref.refType(int)
-
-if (process.platform == 'darwin' || process.platform == 'mac') {
-  var __error = DynamicLibrary().get('__error')
-  errnoPtr = ForeignFunction(__error, intPtr, [])
-} else if (process.platform == 'win32') {
-  var _errno = DynamicLibrary('msvcrt.dll').get('_errno')
-  errnoPtr = ForeignFunction(_errno, intPtr, [])
-} else {  // linux, sunos, etc.
-  var errnoGlobal = DynamicLibrary().get('errno').reinterpret(int.size)
-  errnoPtr = function () { return errnoGlobal }
-  // set the errno type
-  errnoGlobal.type = int
-}
-
-
-function errno () {
-  return errnoPtr().deref()
-}
-module.exports = errno
-
-}).call(this,require('_process'))
-},{"./dynamic_library":28,"./foreign_function":31,"_process":16,"ref":41}],30:[function(require,module,exports){
-
-/**
- * Module dependencies.
- */
-
-var ref = require('ref')
-var assert = require('assert')
-var debug = require('debug')('ffi:ffi')
-var Struct = require('ref-struct')
-var bindings = require('./bindings')
-
-/**
- * Export some of the properties from the "bindings" file.
- */
-
-;['HAS_OBJC', 'FFI_TYPES',
-, 'FFI_OK', 'FFI_BAD_TYPEDEF', 'FFI_BAD_ABI'
-, 'FFI_DEFAULT_ABI', 'FFI_FIRST_ABI', 'FFI_LAST_ABI', 'FFI_SYSV', 'FFI_UNIX64'
-, 'FFI_WIN64', 'FFI_VFP', 'FFI_STDCALL', 'FFI_THISCALL', 'FFI_FASTCALL'
-, 'RTLD_LAZY', 'RTLD_NOW', 'RTLD_LOCAL', 'RTLD_GLOBAL', 'RTLD_NOLOAD'
-, 'RTLD_NODELETE', 'RTLD_FIRST', 'RTLD_NEXT', 'RTLD_DEFAULT', 'RTLD_SELF'
-, 'RTLD_MAIN_ONLY', 'FFI_MS_CDECL'].forEach(function (prop) {
-  if (!bindings.hasOwnProperty(prop)) {
-    return debug('skipping exporting of non-existant property', prop)
-  }
-  var desc = Object.getOwnPropertyDescriptor(bindings, prop)
-  Object.defineProperty(exports, prop, desc)
-})
-
-/**
- * Set the `ffi_type` property on the built-in types.
- */
-
-Object.keys(bindings.FFI_TYPES).forEach(function (name) {
-  var type = bindings.FFI_TYPES[name]
-  type.name = name
-  if (name === 'pointer') return // there is no "pointer" type...
-  ref.types[name].ffi_type = type
-})
-
-// make `size_t` use the "ffi_type_pointer"
-ref.types.size_t.ffi_type = bindings.FFI_TYPES.pointer
-
-// make `Utf8String` use "ffi_type_pointer"
-var CString = ref.types.CString || ref.types.Utf8String
-CString.ffi_type = bindings.FFI_TYPES.pointer
-
-// make `Object` use the "ffi_type_pointer"
-ref.types.Object.ffi_type = bindings.FFI_TYPES.pointer
-
-
-// libffi is weird when it comes to long data types (defaults to 64-bit),
-// so we emulate here, since some platforms have 32-bit longs and some
-// platforms have 64-bit longs.
-switch (ref.sizeof.long) {
-  case 4:
-    ref.types.ulong.ffi_type = bindings.FFI_TYPES.uint32
-    ref.types.long.ffi_type = bindings.FFI_TYPES.int32
-    break;
-  case 8:
-    ref.types.ulong.ffi_type = bindings.FFI_TYPES.uint64
-    ref.types.long.ffi_type = bindings.FFI_TYPES.int64
-    break;
-  default:
-    throw new Error('unsupported "long" size: ' + ref.sizeof.long)
-}
-
-/**
- * Alias the "ref" types onto ffi's exports, for convenience...
- */
-
-exports.types = ref.types
-
-// Include our other modules
-exports.CIF = require('./cif')
-exports.CIF_var = require('./cif_var')
-exports.Function = require('./function')
-exports.ForeignFunction = require('./foreign_function')
-exports.VariadicForeignFunction = require('./foreign_function_var')
-exports.DynamicLibrary = require('./dynamic_library')
-exports.Library = require('./library')
-exports.Callback = require('./callback')
-exports.errno = require('./errno')
-exports.ffiType = require('./type')
-
-// the shared library extension for this platform
-exports.LIB_EXT = exports.Library.EXT
-
-// the FFI_TYPE struct definition
-exports.FFI_TYPE = exports.ffiType.FFI_TYPE
-
-},{"./bindings":24,"./callback":25,"./cif":26,"./cif_var":27,"./dynamic_library":28,"./errno":29,"./foreign_function":31,"./foreign_function_var":32,"./function":33,"./library":34,"./type":35,"assert":7,"debug":37,"ref":41,"ref-struct":40}],31:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var CIF = require('./cif')
-  , _ForeignFunction = require('./_foreign_function')
-  , debug = require('debug')('ffi:ForeignFunction')
-  , assert = require('assert')
-  , ref = require('ref')
-
-/**
- * Represents a foreign function in another library. Manages all of the aspects
- * of function execution, including marshalling the data parameters for the
- * function into native types and also unmarshalling the return from function
- * execution.
- */
-
-function ForeignFunction (funcPtr, returnType, argTypes, abi) {
-  debug('creating new ForeignFunction', funcPtr)
-
-  // check args
-  assert(Buffer.isBuffer(funcPtr), 'expected Buffer as first argument')
-  assert(!!returnType, 'expected a return "type" object as the second argument')
-  assert(Array.isArray(argTypes), 'expected Array of arg "type" objects as the third argument')
-
-  // normalize the "types" (they could be strings,
-  // so turn into real type instances)
-  returnType = ref.coerceType(returnType)
-  argTypes = argTypes.map(ref.coerceType)
-
-  // create the `ffi_cif *` instance
-  var cif = CIF(returnType, argTypes, abi)
-
-  // create and return the JS proxy function
-  return _ForeignFunction(cif, funcPtr, returnType, argTypes)
-}
-module.exports = ForeignFunction
-
-}).call(this,{"isBuffer":require("../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":14,"./_foreign_function":23,"./cif":26,"assert":7,"debug":37,"ref":41}],32:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var CIF_var = require('./cif_var')
-  , Type = require('./type')
-  , _ForeignFunction = require('./_foreign_function')
-  , assert = require('assert')
-  , debug = require('debug')('ffi:VariadicForeignFunction')
-  , ref = require('ref')
-  , bindings = require('./bindings')
-  , POINTER_SIZE = ref.sizeof.pointer
-  , FFI_ARG_SIZE = bindings.FFI_ARG_SIZE
-
-/**
- * For when you want to call to a C function with variable amount of arguments.
- * i.e. `printf()`.
- *
- * This function takes care of caching and reusing ForeignFunction instances that
- * contain the same ffi_type argument signature.
- */
-
-function VariadicForeignFunction (funcPtr, returnType, fixedArgTypes, abi) {
-  debug('creating new VariadicForeignFunction', funcPtr)
-
-  // the cache of ForeignFunction instances that this
-  // VariadicForeignFunction has created so far
-  var cache = {}
-
-  // check args
-  assert(Buffer.isBuffer(funcPtr), 'expected Buffer as first argument')
-  assert(!!returnType, 'expected a return "type" object as the second argument')
-  assert(Array.isArray(fixedArgTypes), 'expected Array of arg "type" objects as the third argument')
-
-  var numFixedArgs = fixedArgTypes.length
-
-  // normalize the "types" (they could be strings,
-  // so turn into real type instances)
-  fixedArgTypes = fixedArgTypes.map(ref.coerceType)
-
-  // get the names of the fixed arg types
-  var fixedKey = fixedArgTypes.map(function (type) {
-    return getId(type)
-  })
-
-
-  // what gets returned is another function that needs to be invoked with the rest
-  // of the variadic types that are being invoked from the function.
-  function variadic_function_generator () {
-    debug('variadic_function_generator invoked')
-
-    // first get the types of variadic args we are working with
-    var argTypes = fixedArgTypes.slice()
-    var key = fixedKey.slice()
-
-    for (var i = 0; i < arguments.length; i++) {
-      var type = ref.coerceType(arguments[i])
-      argTypes.push(type)
-
-      var ffi_type = Type(type)
-      assert(ffi_type.name)
-      key.push(getId(type))
-    }
-
-    // now figure out the return type
-    var rtnType = ref.coerceType(variadic_function_generator.returnType)
-    var rtnName = getId(rtnType)
-    assert(rtnName)
-
-    // first let's generate the key and see if we got a cache-hit
-    key = rtnName + key.join('')
-
-    var func = cache[key]
-    if (func) {
-      debug('cache hit for key:', key)
-    } else {
-      // create the `ffi_cif *` instance
-      debug('creating the variadic ffi_cif instance for key:', key)
-      var cif = CIF_var(returnType, argTypes, numFixedArgs, abi)
-      func = cache[key] = _ForeignFunction(cif, funcPtr, rtnType, argTypes)
-    }
-    return func
-  }
-
-  // set the return type. we set it as a property of the function generator to
-  // allow for monkey patching the return value in the very rare case where the
-  // return type is variadic as well
-  variadic_function_generator.returnType = returnType
-
-  return variadic_function_generator
-}
-
-module.exports = VariadicForeignFunction
-
-var idKey = '_ffiId'
-function getId (type) {
-  if (!type.hasOwnProperty(idKey)) {
-    type[idKey] = (((1+Math.random())*0x10000)|0).toString(16)
-  }
-  return type[idKey]
-}
-
-}).call(this,{"isBuffer":require("../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":14,"./_foreign_function":23,"./bindings":24,"./cif_var":27,"./type":35,"assert":7,"debug":37,"ref":41}],33:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var ref = require('ref')
-  , assert = require('assert')
-  , bindings = require('./bindings')
-  , Callback = require('./callback')
-  , ForeignFunction = require('./foreign_function')
-  , debug = require('debug')('ffi:FunctionType')
- 
-/**
- * Module exports.
- */
-
-module.exports = Function
-
-/**
- * Creates and returns a "type" object for a C "function pointer".
- *
- * @api public
- */
-
-function Function (retType, argTypes, abi) {
-  if (!(this instanceof Function)) {
-    return new Function(retType, argTypes, abi)
-  }
-
-  debug('creating new FunctionType')
-
-  // check args
-  assert(!!retType, 'expected a return "type" object as the first argument')
-  assert(Array.isArray(argTypes), 'expected Array of arg "type" objects as the second argument')
-
-  // normalize the "types" (they could be strings, so turn into real type
-  // instances)
-  this.retType = ref.coerceType(retType)
-  this.argTypes = argTypes.map(ref.coerceType)
-  this.abi = null == abi ? bindings.FFI_DEFAULT_ABI : abi
-}
-
-/**
- * The "ffi_type" is set for node-ffi functions.
- */
-
-Function.prototype.ffi_type = bindings.FFI_TYPES.pointer
-
-/**
- * The "size" is always pointer-sized.
- */
-
-Function.prototype.size = ref.sizeof.pointer
-
-/**
- * The "alignment" is always pointer-aligned.
- */
-
-Function.prototype.alignment = ref.alignof.pointer
-
-/**
- * The "indirection" is always 1 to ensure that our get()/set() get called.
- */
-
-Function.prototype.indirection = 1
-
-/**
- * Returns a ffi.Callback pointer (Buffer) of this function type for the
- * given `fn` Function.
- */
-
-Function.prototype.toPointer = function toPointer (fn) {
-  return Callback(this.retType, this.argTypes, this.abi, fn)
-}
-
-/**
- * Returns a ffi.ForeignFunction (Function) of this function type for the
- * given `buf` Buffer.
- */
-
-Function.prototype.toFunction = function toFunction (buf) {
-  return ForeignFunction(buf, this.retType, this.argTypes, this.abi)
-}
-
-/**
- * get function; return a ForeignFunction instance.
- */
-
-Function.prototype.get = function get (buffer, offset) {
-  debug('ffi FunctionType "get" function')
-  var ptr = buffer.readPointer(offset)
-  return this.toFunction(ptr)
-}
-
-/**
- * set function; return a Callback buffer.
- */
-
-Function.prototype.set = function set (buffer, offset, value) {
-  debug('ffi FunctionType "set" function')
-  var ptr
-  if ('function' == typeof value) {
-    ptr = this.toPointer(value)
-  } else if (Buffer.isBuffer(value)) {
-    ptr = value
-  } else {
-    throw new Error('don\'t know how to set callback function for: ' + value)
-  }
-  buffer.writePointer(ptr, offset)
-}
-
-}).call(this,{"isBuffer":require("../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js")})
-},{"../../../../browserify/node_modules/insert-module-globals/node_modules/is-buffer/index.js":14,"./bindings":24,"./callback":25,"./foreign_function":31,"assert":7,"debug":37,"ref":41}],34:[function(require,module,exports){
-(function (process){
-
-/**
- * Module dependencies.
- */
-
-var DynamicLibrary = require('./dynamic_library')
-  , ForeignFunction = require('./foreign_function')
-  , VariadicForeignFunction = require('./foreign_function_var')
-  , debug = require('debug')('ffi:Library')
-  , RTLD_NOW = DynamicLibrary.FLAGS.RTLD_NOW
-
-/**
- * The extension to use on libraries.
- * i.e.  libm  ->  libm.so   on linux
- */
-
-var EXT = Library.EXT = {
-    'linux':  '.so'
-  , 'linux2': '.so'
-  , 'sunos':  '.so'
-  , 'solaris':'.so'
-  , 'freebsd':'.so'
-  , 'openbsd':'.so'
-  , 'darwin': '.dylib'
-  , 'mac':    '.dylib'
-  , 'win32':  '.dll'
-}[process.platform]
-
-/**
- * Provides a friendly abstraction/API on-top of DynamicLibrary and
- * ForeignFunction.
- */
-
-function Library (libfile, funcs, lib) {
-  debug('creating Library object for', libfile)
-
-  if (libfile && libfile.indexOf(EXT) === -1) {
-    debug('appending library extension to library name', EXT)
-    libfile += EXT
-  }
-
-  if (!lib) {
-    lib = {}
-  }
-  var dl = new DynamicLibrary(libfile || null, RTLD_NOW)
-
-  Object.keys(funcs || {}).forEach(function (func) {
-    debug('defining function', func)
-
-    var fptr = dl.get(func)
-      , info = funcs[func]
-
-    if (fptr.isNull()) {
-      throw new Error('Library: "' + libfile
-        + '" returned NULL function pointer for "' + func + '"')
-    }
-
-    var resultType = info[0]
-      , paramTypes = info[1]
-      , fopts = info[2]
-      , abi = fopts && fopts.abi
-      , async = fopts && fopts.async
-      , varargs = fopts && fopts.varargs
-
-    if (varargs) {
-      lib[func] = VariadicForeignFunction(fptr, resultType, paramTypes, abi)
-    } else {
-      var ff = ForeignFunction(fptr, resultType, paramTypes, abi)
-      lib[func] = async ? ff.async : ff
-    }
-  })
-
-  return lib
-}
-module.exports = Library
-
-}).call(this,require('_process'))
-},{"./dynamic_library":28,"./foreign_function":31,"./foreign_function_var":32,"_process":16,"debug":37}],35:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * Module dependencies.
- */
-
-var ref = require('ref')
-var assert = require('assert')
-var debug = require('debug')('ffi:types')
-var Struct = require('ref-struct')
-var bindings = require('./bindings')
-
-/**
- * Define the `ffi_type` struct (see deps/libffi/include/ffi.h) for use in JS.
- * This struct type is used internally to define custom struct rtn/arg types.
- */
-
-var FFI_TYPE = Type.FFI_TYPE = Struct()
-FFI_TYPE.defineProperty('size',      ref.types.size_t)
-FFI_TYPE.defineProperty('alignment', ref.types.ushort)
-FFI_TYPE.defineProperty('type',      ref.types.ushort)
-// this last prop is a C Array of `ffi_type *` elements, so this is `ffi_type **`
-var ffi_type_ptr_array = ref.refType(ref.refType(FFI_TYPE))
-FFI_TYPE.defineProperty('elements',  ffi_type_ptr_array)
-assert.equal(bindings.FFI_TYPE_SIZE, FFI_TYPE.size)
-
-/**
- * Returns a `ffi_type *` Buffer appropriate for the given "type".
- *
- * @param {Type|String} type A "ref" type (or string) to get the `ffi_type` for
- * @return {Buffer} A buffer pointing to a `ffi_type` instance for "type"
- * @api private
- */
-
-function Type (type) {
-  type = ref.coerceType(type)
-  debug('Type()', type.name || type)
-  assert(type.indirection >= 1, 'invalid "type" given: ' + (type.name || type))
-  var rtn
-
-  // first we assume it's a regular "type". if the "indirection" is greater than
-  // 1, then we can just use "pointer" ffi_type, otherwise we hope "ffi_type" is
-  // set
-  if (type.indirection === 1) {
-    rtn = type.ffi_type
-  } else {
-    rtn = bindings.FFI_TYPES.pointer
-  }
-
-  // if "rtn" isn't set (ffi_type was not set) then we check for "ref-array" type
-  if (!rtn && type.type) {
-    // got a "ref-array" type
-    // passing arrays to C functions are always by reference, so we use "pointer"
-    rtn = bindings.FFI_TYPES.pointer
-  }
-
-  if (!rtn && type.fields) {
-    // got a "ref-struct" type
-    // need to create the `ffi_type` instance manually
-    debug('creating an `ffi_type` for given "ref-struct" type')
-    var fields = type.fields
-      , fieldNames = Object.keys(fields)
-      , numFields = fieldNames.length
-      , numElements = 0
-      , ffi_type = new FFI_TYPE
-      , i = 0
-      , field
-      , ffi_type_ptr
-
-    // these are the "ffi_type" values expected for a struct
-    ffi_type.size = 0
-    ffi_type.alignment = 0
-    ffi_type.type = 13 // FFI_TYPE_STRUCT
-
-    // first we have to figure out the number of "elements" that will go in the
-    // array. this would normally just be "numFields" but we also have to account
-    // for arrays, which each act as their own element
-    for (i = 0; i < numFields; i++) {
-      field = fields[fieldNames[i]]
-      if (field.type.fixedLength > 0) {
-        // a fixed-length "ref-array" type
-        numElements += field.type.fixedLength
-      } else {
-        numElements += 1
-      }
-    }
-
-    // hand-crafting a null-terminated array here.
-    // XXX: use "ref-array"?
-    var size = ref.sizeof.pointer * (numElements + 1) // +1 because of the NULL terminator
-    var elements = ffi_type.elements = new Buffer(size)
-    var index = 0
-    for (i = 0; i < numFields; i++) {
-      field = fields[fieldNames[i]]
-      if (field.type.fixedLength > 0) {
-        // a fixed-length "ref-array" type
-        ffi_type_ptr = Type(field.type.type)
-        for (var j = 0; j < field.type.fixedLength; j++) {
-          elements.writePointer(ffi_type_ptr, (index++) * ref.sizeof.pointer)
-        }
-      } else {
-        ffi_type_ptr = Type(field.type)
-        elements.writePointer(ffi_type_ptr, (index++) * ref.sizeof.pointer)
-      }
-    }
-    // final NULL pointer to terminate the Array
-    elements.writePointer(ref.NULL, index * ref.sizeof.pointer)
-    // also set the `ffi_type` property to that it's cached for next time
-    rtn = type.ffi_type = ffi_type.ref()
-  }
-
-  if (!rtn && type.name) {
-    // handle "ref" types other than the set that node-ffi is using (i.e.
-    // a separate copy)
-    if ('CString' == type.name) {
-      rtn = type.ffi_type = bindings.FFI_TYPES.pointer
-    } else {
-      var cur = type
-      while (!rtn && cur) {
-        rtn = cur.ffi_type = bindings.FFI_TYPES[cur.name]
-        cur = Object.getPrototypeOf(cur)
-      }
-    }
-  }
-
-  assert(rtn, 'Could not determine the `ffi_type` instance for type: ' + (type.name || type))
-  debug('returning `ffi_type`', rtn.name)
-  return rtn
-}
-module.exports = Type
-
-}).call(this,require("buffer").Buffer)
-},{"./bindings":24,"assert":7,"buffer":8,"debug":37,"ref":41,"ref-struct":40}],36:[function(require,module,exports){
-(function (process,__filename){
-
-/**
- * Module dependencies.
- */
-
-var fs = require('fs')
-  , path = require('path')
-  , join = path.join
-  , dirname = path.dirname
-  , exists = fs.existsSync || path.existsSync
-  , defaults = {
-        arrow: process.env.NODE_BINDINGS_ARROW || ' → '
-      , compiled: process.env.NODE_BINDINGS_COMPILED_DIR || 'compiled'
-      , platform: process.platform
-      , arch: process.arch
-      , version: process.versions.node
-      , bindings: 'bindings.node'
-      , try: [
-          // node-gyp's linked version in the "build" dir
-          [ 'module_root', 'build', 'bindings' ]
-          // node-waf and gyp_addon (a.k.a node-gyp)
-        , [ 'module_root', 'build', 'Debug', 'bindings' ]
-        , [ 'module_root', 'build', 'Release', 'bindings' ]
-          // Debug files, for development (legacy behavior, remove for node v0.9)
-        , [ 'module_root', 'out', 'Debug', 'bindings' ]
-        , [ 'module_root', 'Debug', 'bindings' ]
-          // Release files, but manually compiled (legacy behavior, remove for node v0.9)
-        , [ 'module_root', 'out', 'Release', 'bindings' ]
-        , [ 'module_root', 'Release', 'bindings' ]
-          // Legacy from node-waf, node <= 0.4.x
-        , [ 'module_root', 'build', 'default', 'bindings' ]
-          // Production "Release" buildtype binary (meh...)
-        , [ 'module_root', 'compiled', 'version', 'platform', 'arch', 'bindings' ]
-        ]
-    }
-
-/**
- * The main `bindings()` function loads the compiled bindings for a given module.
- * It uses V8's Error API to determine the parent filename that this function is
- * being invoked from, which is then used to find the root directory.
- */
-
-function bindings (opts) {
-
-  // Argument surgery
-  if (typeof opts == 'string') {
-    opts = { bindings: opts }
-  } else if (!opts) {
-    opts = {}
-  }
-  opts.__proto__ = defaults
-
-  // Get the module root
-  if (!opts.module_root) {
-    opts.module_root = exports.getRoot(exports.getFileName())
-  }
-
-  // Ensure the given bindings name ends with .node
-  if (path.extname(opts.bindings) != '.node') {
-    opts.bindings += '.node'
-  }
-
-  var tries = []
-    , i = 0
-    , l = opts.try.length
-    , n
-    , b
-    , err
-
-  for (; i<l; i++) {
-    n = join.apply(null, opts.try[i].map(function (p) {
-      return opts[p] || p
-    }))
-    tries.push(n)
-    try {
-      b = opts.path ? require.resolve(n) : require(n)
-      if (!opts.path) {
-        b.path = n
-      }
-      return b
-    } catch (e) {
-      if (!/not find/i.test(e.message)) {
-        throw e
-      }
-    }
-  }
-
-  err = new Error('Could not locate the bindings file. Tried:\n'
-    + tries.map(function (a) { return opts.arrow + a }).join('\n'))
-  err.tries = tries
-  throw err
-}
-module.exports = exports = bindings
-
-
-/**
- * Gets the filename of the JavaScript file that invokes this function.
- * Used to help find the root directory of a module.
- * Optionally accepts an filename argument to skip when searching for the invoking filename
- */
-
-exports.getFileName = function getFileName (calling_file) {
-  var origPST = Error.prepareStackTrace
-    , origSTL = Error.stackTraceLimit
-    , dummy = {}
-    , fileName
-
-  Error.stackTraceLimit = 10
-
-  Error.prepareStackTrace = function (e, st) {
-    for (var i=0, l=st.length; i<l; i++) {
-      fileName = st[i].getFileName()
-      if (fileName !== __filename) {
-        if (calling_file) {
-            if (fileName !== calling_file) {
-              return
-            }
-        } else {
-          return
-        }
-      }
-    }
-  }
-
-  // run the 'prepareStackTrace' function above
-  Error.captureStackTrace(dummy)
-  dummy.stack
-
-  // cleanup
-  Error.prepareStackTrace = origPST
-  Error.stackTraceLimit = origSTL
-
-  return fileName
-}
-
-/**
- * Gets the root directory of a module, given an arbitrary filename
- * somewhere in the module tree. The "root directory" is the directory
- * containing the `package.json` file.
- *
- *   In:  /home/nate/node-native-module/lib/index.js
- *   Out: /home/nate/node-native-module
- */
-
-exports.getRoot = function getRoot (file) {
-  var dir = dirname(file)
-    , prev
-  while (true) {
-    if (dir === '.') {
-      // Avoids an infinite loop in rare cases, like the REPL
-      dir = process.cwd()
-    }
-    if (exists(join(dir, 'package.json')) || exists(join(dir, 'node_modules'))) {
-      // Found the 'package.json' file or 'node_modules' dir; we're done
-      return dir
-    }
-    if (prev === dir) {
-      // Got to the top
-      throw new Error('Could not find module root given file: "' + file
-                    + '". Do you have a `package.json` file? ')
-    }
-    // Try the parent dir next
-    prev = dir
-    dir = join(dir, '..')
-  }
-}
-
-}).call(this,require('_process'),"/node_modules/lapack/node_modules/ffi/node_modules/bindings/bindings.js")
-},{"_process":16,"fs":6,"path":15}],37:[function(require,module,exports){
-
-/**
- * This is the web browser implementation of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = require('./debug');
-exports.log = log;
-exports.formatArgs = formatArgs;
-exports.save = save;
-exports.load = load;
-exports.useColors = useColors;
-exports.storage = 'undefined' != typeof chrome
-               && 'undefined' != typeof chrome.storage
-                  ? chrome.storage.local
-                  : localstorage();
-
-/**
- * Colors.
- */
-
-exports.colors = [
-  'lightseagreen',
-  'forestgreen',
-  'goldenrod',
-  'dodgerblue',
-  'darkorchid',
-  'crimson'
-];
-
-/**
- * Currently only WebKit-based Web Inspectors, Firefox >= v31,
- * and the Firebug extension (any Firefox version) are known
- * to support "%c" CSS customizations.
- *
- * TODO: add a `localStorage` variable to explicitly enable/disable colors
- */
-
-function useColors() {
-  // is webkit? http://stackoverflow.com/a/16459606/376773
-  return ('WebkitAppearance' in document.documentElement.style) ||
-    // is firebug? http://stackoverflow.com/a/398120/376773
-    (window.console && (console.firebug || (console.exception && console.table))) ||
-    // is firefox >= v31?
-    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
-    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
-}
-
-/**
- * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
- */
-
-exports.formatters.j = function(v) {
-  return JSON.stringify(v);
-};
-
-
-/**
- * Colorize log arguments if enabled.
- *
- * @api public
- */
-
-function formatArgs() {
-  var args = arguments;
-  var useColors = this.useColors;
-
-  args[0] = (useColors ? '%c' : '')
-    + this.namespace
-    + (useColors ? ' %c' : ' ')
-    + args[0]
-    + (useColors ? '%c ' : ' ')
-    + '+' + exports.humanize(this.diff);
-
-  if (!useColors) return args;
-
-  var c = 'color: ' + this.color;
-  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
-
-  // the final "%c" is somewhat tricky, because there could be other
-  // arguments passed either before or after the %c, so we need to
-  // figure out the correct index to insert the CSS into
-  var index = 0;
-  var lastC = 0;
-  args[0].replace(/%[a-z%]/g, function(match) {
-    if ('%%' === match) return;
-    index++;
-    if ('%c' === match) {
-      // we only are interested in the *last* %c
-      // (the user may have provided their own)
-      lastC = index;
-    }
-  });
-
-  args.splice(lastC, 0, c);
-  return args;
-}
-
-/**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
- *
- * @api public
- */
-
-function log() {
-  // this hackery is required for IE8/9, where
-  // the `console.log` function doesn't have 'apply'
-  return 'object' === typeof console
-    && console.log
-    && Function.prototype.apply.call(console.log, console, arguments);
-}
-
-/**
- * Save `namespaces`.
- *
- * @param {String} namespaces
- * @api private
- */
-
-function save(namespaces) {
-  try {
-    if (null == namespaces) {
-      exports.storage.removeItem('debug');
-    } else {
-      exports.storage.debug = namespaces;
-    }
-  } catch(e) {}
-}
-
-/**
- * Load `namespaces`.
- *
- * @return {String} returns the previously persisted debug modes
- * @api private
- */
-
-function load() {
-  var r;
-  try {
-    r = exports.storage.debug;
-  } catch(e) {}
-  return r;
-}
-
-/**
- * Enable namespaces listed in `localStorage.debug` initially.
- */
-
-exports.enable(load());
-
-/**
- * Localstorage attempts to return the localstorage.
- *
- * This is necessary because safari throws
- * when a user disables cookies/localstorage
- * and you attempt to access it.
- *
- * @return {LocalStorage}
- * @api private
- */
-
-function localstorage(){
-  try {
-    return window.localStorage;
-  } catch (e) {}
-}
-
-},{"./debug":38}],38:[function(require,module,exports){
-
-/**
- * This is the common logic for both the Node.js and web browser
- * implementations of `debug()`.
- *
- * Expose `debug()` as the module.
- */
-
-exports = module.exports = debug;
-exports.coerce = coerce;
-exports.disable = disable;
-exports.enable = enable;
-exports.enabled = enabled;
-exports.humanize = require('ms');
-
-/**
- * The currently active debug mode names, and names to skip.
- */
-
-exports.names = [];
-exports.skips = [];
-
-/**
- * Map of special "%n" handling functions, for the debug "format" argument.
- *
- * Valid key names are a single, lowercased letter, i.e. "n".
- */
-
-exports.formatters = {};
-
-/**
- * Previously assigned color.
- */
-
-var prevColor = 0;
-
-/**
- * Previous log timestamp.
- */
-
-var prevTime;
-
-/**
- * Select a color.
- *
- * @return {Number}
- * @api private
- */
-
-function selectColor() {
-  return exports.colors[prevColor++ % exports.colors.length];
-}
-
-/**
- * Create a debugger with the given `namespace`.
- *
- * @param {String} namespace
- * @return {Function}
- * @api public
- */
-
-function debug(namespace) {
-
-  // define the `disabled` version
-  function disabled() {
-  }
-  disabled.enabled = false;
-
-  // define the `enabled` version
-  function enabled() {
-
-    var self = enabled;
-
-    // set `diff` timestamp
-    var curr = +new Date();
-    var ms = curr - (prevTime || curr);
-    self.diff = ms;
-    self.prev = prevTime;
-    self.curr = curr;
-    prevTime = curr;
-
-    // add the `color` if not set
-    if (null == self.useColors) self.useColors = exports.useColors();
-    if (null == self.color && self.useColors) self.color = selectColor();
-
-    var args = Array.prototype.slice.call(arguments);
-
-    args[0] = exports.coerce(args[0]);
-
-    if ('string' !== typeof args[0]) {
-      // anything else let's inspect with %o
-      args = ['%o'].concat(args);
-    }
-
-    // apply any `formatters` transformations
-    var index = 0;
-    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
-      // if we encounter an escaped % then don't increase the array index
-      if (match === '%%') return match;
-      index++;
-      var formatter = exports.formatters[format];
-      if ('function' === typeof formatter) {
-        var val = args[index];
-        match = formatter.call(self, val);
-
-        // now we need to remove `args[index]` since it's inlined in the `format`
-        args.splice(index, 1);
-        index--;
-      }
-      return match;
-    });
-
-    if ('function' === typeof exports.formatArgs) {
-      args = exports.formatArgs.apply(self, args);
-    }
-    var logFn = enabled.log || exports.log || console.log.bind(console);
-    logFn.apply(self, args);
-  }
-  enabled.enabled = true;
-
-  var fn = exports.enabled(namespace) ? enabled : disabled;
-
-  fn.namespace = namespace;
-
-  return fn;
-}
-
-/**
- * Enables a debug mode by namespaces. This can include modes
- * separated by a colon and wildcards.
- *
- * @param {String} namespaces
- * @api public
- */
-
-function enable(namespaces) {
-  exports.save(namespaces);
-
-  var split = (namespaces || '').split(/[\s,]+/);
-  var len = split.length;
-
-  for (var i = 0; i < len; i++) {
-    if (!split[i]) continue; // ignore empty strings
-    namespaces = split[i].replace(/\*/g, '.*?');
-    if (namespaces[0] === '-') {
-      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
-    } else {
-      exports.names.push(new RegExp('^' + namespaces + '$'));
-    }
-  }
-}
-
-/**
- * Disable debug output.
- *
- * @api public
- */
-
-function disable() {
-  exports.enable('');
-}
-
-/**
- * Returns true if the given mode name is enabled, false otherwise.
- *
- * @param {String} name
- * @return {Boolean}
- * @api public
- */
-
-function enabled(name) {
-  var i, len;
-  for (i = 0, len = exports.skips.length; i < len; i++) {
-    if (exports.skips[i].test(name)) {
-      return false;
-    }
-  }
-  for (i = 0, len = exports.names.length; i < len; i++) {
-    if (exports.names[i].test(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Coerce `val`.
- *
- * @param {Mixed} val
- * @return {Mixed}
- * @api private
- */
-
-function coerce(val) {
-  if (val instanceof Error) return val.stack || val.message;
-  return val;
-}
-
-},{"ms":39}],39:[function(require,module,exports){
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} options
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options){
-  options = options || {};
-  if ('string' == typeof val) return parse(val);
-  return options.long
-    ? long(val)
-    : short(val);
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = '' + str;
-  if (str.length > 10000) return;
-  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
-  if (!match) return;
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function short(ms) {
-  if (ms >= d) return Math.round(ms / d) + 'd';
-  if (ms >= h) return Math.round(ms / h) + 'h';
-  if (ms >= m) return Math.round(ms / m) + 'm';
-  if (ms >= s) return Math.round(ms / s) + 's';
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function long(ms) {
-  return plural(ms, d, 'day')
-    || plural(ms, h, 'hour')
-    || plural(ms, m, 'minute')
-    || plural(ms, s, 'second')
-    || ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, n, name) {
-  if (ms < n) return;
-  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
-  return Math.ceil(ms / n) + ' ' + name + 's';
-}
-
-},{}],40:[function(require,module,exports){
-(function (Buffer){
-
-/**
- * An interface for modeling and instantiating C-style data structures. This is
- * not a constructor per-say, but a constructor generator. It takes an array of
- * tuples, the left side being the type, and the right side being a field name.
- * The order should be the same order it would appear in the C-style struct
- * definition. It returns a function that can be used to construct an object that
- * reads and writes to the data structure using properties specified by the
- * initial field list.
- *
- * The only verboten field names are "ref", which is used used on struct
- * instances as a function to retrieve the backing Buffer instance of the
- * struct, and "ref.buffer" which contains the backing Buffer instance.
- *
- *
- * Example:
- *
- * ``` javascript
- * var ref = require('ref')
- * var Struct = require('ref-struct')
- *
- * // create the `char *` type
- * var charPtr = ref.refType(ref.types.char)
- * var int = ref.types.int
- *
- * // create the struct "type" / constructor
- * var PasswordEntry = Struct({
- *     'username': 'string'
- *   , 'password': 'string'
- *   , 'salt':     int
- * })
- *
- * // create an instance of the struct, backed a Buffer instance
- * var pwd = new PasswordEntry()
- * pwd.username = 'ricky'
- * pwd.password = 'rbransonlovesnode.js'
- * pwd.salt = (Math.random() * 1000000) | 0
- *
- * pwd.username // → 'ricky'
- * pwd.password // → 'rbransonlovesnode.js'
- * pwd.salt     // → 820088
- * ```
- */
-
-/**
- * Module dependencies.
- */
-
-var ref = require('ref')
-var util = require('util')
-var assert = require('assert')
-var debug = require('debug')('ref:struct')
-
-/**
- * Module exports.
- */
-
-module.exports = Struct
-
-/**
- * The Struct "type" meta-constructor.
- */
-
-function Struct () {
-  debug('defining new struct "type"')
-
-  /**
-   * This is the "constructor" of the Struct type that gets returned.
-   *
-   * Invoke it with `new` to create a new Buffer instance backing the struct.
-   * Pass it an existing Buffer instance to use that as the backing buffer.
-   * Pass in an Object containing the struct fields to auto-populate the
-   * struct with the data.
-   */
-
-  function StructType (arg, data) {
-    if (!(this instanceof StructType)) {
-      return new StructType(arg, data)
-    }
-    debug('creating new struct instance')
-    var store
-    if (Buffer.isBuffer(arg)) {
-      debug('using passed-in Buffer instance to back the struct', arg)
-      assert(arg.length >= StructType.size, 'Buffer instance must be at least ' +
-          StructType.size + ' bytes to back this struct type')
-      store = arg
-      arg = data
-    } else {
-      debug('creating new Buffer instance to back the struct (size: %d)', StructType.size)
-      store = new Buffer(StructType.size)
-    }
-
-    // set the backing Buffer store
-    store.type = StructType
-    this['ref.buffer'] = store
-
-    if (arg) {
-      for (var key in arg) {
-        // hopefully hit the struct setters
-        this[key] = arg[key]
-      }
-    }
-    StructType._instanceCreated = true
-  }
-
-  // make instances inherit from the `proto`
-  StructType.prototype = Object.create(proto, {
-    constructor: {
-        value: StructType
-      , enumerable: false
-      , writable: true
-      , configurable: true
-    }
-  })
-
-  StructType.defineProperty = defineProperty
-  StructType.toString = toString
-  StructType.fields = {}
-
-  // Setup the ref "type" interface. The constructor doubles as the "type" object
-  StructType.size = 0
-  StructType.alignment = 0
-  StructType.indirection = 1
-  StructType.get = get
-  StructType.set = set
-
-  // Read the fields list and apply all the fields to the struct
-  // TODO: Better arg handling... (maybe look at ES6 binary data API?)
-  var arg = arguments[0]
-  if (Array.isArray(arg)) {
-    // legacy API
-    arg.forEach(function (a) {
-      var type = a[0]
-      var name = a[1]
-      StructType.defineProperty(name, type)
-    })
-  } else if (typeof arg === 'object') {
-    Object.keys(arg).forEach(function (name) {
-      var type = arg[name]
-      StructType.defineProperty(name, type)
-    })
-  }
-
-  return StructType
-}
-
-/**
- * The "get" function of the Struct "type" interface
- */
-
-function get (buffer, offset) {
-  debug('Struct "type" getter for buffer at offset', buffer, offset)
-  if (offset > 0) {
-    buffer = buffer.slice(offset)
-  }
-  return new this(buffer)
-}
-
-/**
- * The "set" function of the Struct "type" interface
- */
-
-function set (buffer, offset, value) {
-  debug('Struct "type" setter for buffer at offset', buffer, offset, value)
-  var isStruct = value instanceof this
-  if (isStruct) {
-    // optimization: copy the buffer contents directly rather
-    // than going through the ref-struct constructor
-    value['ref.buffer'].copy(buffer, offset, 0, this.size);
-  } else {
-    if (offset > 0) {
-      buffer = buffer.slice(offset)
-    }
-    new this(buffer, value)
-  }
-}
-
-/**
- * Custom `toString()` override for struct type instances.
- */
-
-function toString () {
-  return '[StructType]'
-}
-
-/**
- * Adds a new field to the struct instance with the given name and type.
- * Note that this function will throw an Error if any instances of the struct
- * type have already been created, therefore this function must be called at the
- * beginning, before any instances are created.
- */
-
-function defineProperty (name, type) {
-  debug('defining new struct type field', name)
-
-  // allow string types for convenience
-  type = ref.coerceType(type)
-
-  assert(!this._instanceCreated, 'an instance of this Struct type has already ' +
-      'been created, cannot add new "fields" anymore')
-  assert.equal('string', typeof name, 'expected a "string" field name')
-  assert(type && /object|function/i.test(typeof type) && 'size' in type &&
-      'indirection' in type
-      , 'expected a "type" object describing the field type: "' + type + '"')
-  assert(type.indirection > 1 || type.size > 0,
-      '"type" object must have a size greater than 0')
-  assert(!(name in this.prototype), 'the field "' + name +
-      '" already exists in this Struct type')
-
-  var field = {
-    type: type
-  }
-  this.fields[name] = field
-
-  // define the getter/setter property
-  var desc = { enumerable: true , configurable: true }
-  desc.get = function () {
-    debug('getting "%s" struct field (offset: %d)', name, field.offset)
-    return ref.get(this['ref.buffer'], field.offset, type)
-  }
-  desc.set = function (value) {
-    debug('setting "%s" struct field (offset: %d)', name, field.offset, value)
-    return ref.set(this['ref.buffer'], field.offset, value, type)
-  }
-
-  // calculate the new size and field offsets
-  recalc(this)
-
-  Object.defineProperty(this.prototype, name, desc);
-}
-
-function recalc (struct) {
-
-  // reset size and alignment
-  struct.size = 0
-  struct.alignment = 0
-
-  var fieldNames = Object.keys(struct.fields)
-
-  // first loop through is to determine the `alignment` of this struct
-  fieldNames.forEach(function (name) {
-    var field = struct.fields[name]
-    var type = field.type
-    var alignment = type.alignment || ref.alignof.pointer
-    if (type.indirection > 1) {
-      alignment = ref.alignof.pointer
-    }
-    struct.alignment = Math.max(struct.alignment, alignment)
-  })
-
-  // second loop through sets the `offset` property on each "field"
-  // object, and sets the `struct.size` as we go along
-  fieldNames.forEach(function (name) {
-    var field = struct.fields[name]
-    var type = field.type
-
-    if (null != type.fixedLength) {
-      // "ref-array" types set the "fixedLength" prop. don't treat arrays like one
-      // contiguous entity. instead, treat them like individual elements in the
-      // struct. doing this makes the padding end up being calculated correctly.
-      field.offset = addType(type.type)
-      for (var i = 1; i < type.fixedLength; i++) {
-        addType(type.type)
-      }
-    } else {
-      field.offset = addType(type)
-    }
-  })
-
-  function addType (type) {
-    var offset = struct.size
-    var align = type.indirection === 1 ? type.alignment : ref.alignof.pointer
-    var padding = (align - (offset % align)) % align
-    var size = type.indirection === 1 ? type.size : ref.sizeof.pointer
-
-    offset += padding
-
-    assert.equal(offset % align, 0, "offset should align")
-
-    // adjust the "size" of the struct type
-    struct.size = offset + size
-
-    // return the calulated offset
-    return offset
-  }
-
-  // any final padding?
-  var left = struct.size % struct.alignment
-  if (left > 0) {
-    debug('additional padding to the end of struct:', struct.alignment - left)
-    struct.size += struct.alignment - left
-  }
-}
-
-/**
- * this is the custom prototype of Struct type instances.
- */
-
-var proto = {}
-
-/**
- * set a placeholder variable on the prototype so that defineProperty() will
- * throw an error if you try to define a struct field with the name "buffer".
- */
-
-proto['ref.buffer'] = ref.NULL
-
-/**
- * Flattens the Struct instance into a regular JavaScript Object. This function
- * "gets" all the defined properties.
- *
- * @api public
- */
-
-proto.toObject = function toObject () {
-  var obj = {}
-  Object.keys(this.constructor.fields).forEach(function (k) {
-    obj[k] = this[k]
-  }, this)
-  return obj
-}
-
-/**
- * Basic `JSON.stringify(struct)` support.
- */
-
-proto.toJSON = function toJSON () {
-  return this.toObject()
-}
-
-/**
- * `.inspect()` override. For the REPL.
- *
- * @api public
- */
-
-proto.inspect = function inspect () {
-  var obj = this.toObject()
-  // add instance's "own properties"
-  Object.keys(this).forEach(function (k) {
-    obj[k] = this[k]
-  }, this)
-  return util.inspect(obj)
-}
-
-/**
- * returns a Buffer pointing to this struct data structure.
- */
-
-proto.ref = function ref () {
-  return this['ref.buffer']
-}
-
-}).call(this,require("buffer").Buffer)
-},{"assert":7,"buffer":8,"debug":37,"ref":41,"util":18}],41:[function(require,module,exports){
-(function (Buffer){
-
-var assert = require('assert')
-var debug = require('debug')('ref')
-
-exports = module.exports = require('bindings')('binding')
-
-/**
- * A `Buffer` that references the C NULL pointer. That is, its memory address
- * points to 0. Its `length` is 0 because accessing any data from this buffer
- * would cause a _segmentation fault_.
- *
- * ```
- * console.log(ref.NULL);
- * <SlowBuffer@0x0 >
- * ```
- *
- * @name NULL
- * @type Buffer
- */
-
-/**
- * A string that represents the native endianness of the machine's processor.
- * The possible values are either `"LE"` or `"BE"`.
- *
- * ```
- * console.log(ref.endianness);
- * 'LE'
- * ```
- *
- * @name endianness
- * @type String
- */
-
-/**
- * Accepts a `Buffer` instance and returns the memory address of the buffer
- * instance.
- *
- * ```
- * console.log(ref.address(new Buffer(1)));
- * 4320233616
- *
- * console.log(ref.address(ref.NULL)));
- * 0
- * ```
- *
- * @param {Buffer} buffer The buffer to get the memory address of.
- * @return {Number} The memory address the buffer instance.
- * @name address
- * @type method
- */
-
-/**
- * Accepts a `Buffer` instance and returns _true_ if the buffer represents the
- * NULL pointer, _false_ otherwise.
- *
- * ```
- * console.log(ref.isNull(new Buffer(1)));
- * false
- *
- * console.log(ref.isNull(ref.NULL));
- * true
- * ```
- *
- * @param {Buffer} buffer The buffer to check for NULL.
- * @return {Boolean} true or false.
- * @name isNull
- * @type method
- */
-
-/**
- * Reads a JavaScript Object that has previously been written to the given
- * _buffer_ at the given _offset_.
- *
- * ```
- * var obj = { foo: 'bar' };
- * var buf = ref.alloc('Object', obj);
- *
- * var obj2 = ref.readObject(buf, 0);
- * console.log(obj === obj2);
- * true
- * ```
- *
- * @param {Buffer} buffer The buffer to read an Object from.
- * @param {Number} offset The offset to begin reading from.
- * @return {Object} The Object that was read from _buffer_.
- * @name readObject
- * @type method
- */
-
-/**
- * Reads a Buffer instance from the given _buffer_ at the given _offset_.
- * The _size_ parameter specifies the `length` of the returned Buffer instance,
- * which defaults to __0__.
- *
- * ```
- * var buf = new Buffer('hello world');
- * var pointer = ref.alloc('pointer');
- *
- * var buf2 = ref.readPointer(pointer, 0, buf.length);
- * console.log(buf.toString());
- * 'hello world'
- * ```
- *
- * @param {Buffer} buffer The buffer to read a Buffer from.
- * @param {Number} offset The offset to begin reading from.
- * @param {Number} length (optional) The length of the returned Buffer. Defaults to 0.
- * @return {Buffer} The Buffer instance that was read from _buffer_.
- * @name readPointer
- * @type method
- */
-
-/**
- * Returns a JavaScript String read from _buffer_ at the given _offset_. The
- * C String is read until the first NULL byte, which indicates the end of the
- * String.
- *
- * This function can read beyond the `length` of a Buffer.
- *
- * ```
- * var buf = new Buffer('hello\0world\0');
- *
- * var str = ref.readCString(buf, 0);
- * console.log(str);
- * 'hello'
- * ```
- *
- * @param {Buffer} buffer The buffer to read a Buffer from.
- * @param {Number} offset The offset to begin reading from.
- * @return {String} The String that was read from _buffer_.
- * @name readCString
- * @type method
- */
-
-/**
- * Returns a big-endian signed 64-bit int read from _buffer_ at the given
- * _offset_.
- *
- * If the returned value will fit inside a JavaScript Number without losing
- * precision, then a Number is returned, otherwise a String is returned.
- *
- * ```
- * var buf = ref.alloc('int64');
- * ref.writeInt64BE(buf, 0, '9223372036854775807');
- *
- * var val = ref.readInt64BE(buf, 0)
- * console.log(val)
- * '9223372036854775807'
- * ```
- *
- * @param {Buffer} buffer The buffer to read a Buffer from.
- * @param {Number} offset The offset to begin reading from.
- * @return {Number|String} The Number or String that was read from _buffer_.
- * @name readInt64BE
- * @type method
- */
-
-/**
- * Returns a little-endian signed 64-bit int read from _buffer_ at the given
- * _offset_.
- *
- * If the returned value will fit inside a JavaScript Number without losing
- * precision, then a Number is returned, otherwise a String is returned.
- *
- * ```
- * var buf = ref.alloc('int64');
- * ref.writeInt64LE(buf, 0, '9223372036854775807');
- *
- * var val = ref.readInt64LE(buf, 0)
- * console.log(val)
- * '9223372036854775807'
- * ```
- *
- * @param {Buffer} buffer The buffer to read a Buffer from.
- * @param {Number} offset The offset to begin reading from.
- * @return {Number|String} The Number or String that was read from _buffer_.
- * @name readInt64LE
- * @type method
- */
-
-/**
- * Returns a big-endian unsigned 64-bit int read from _buffer_ at the given
- * _offset_.
- *
- * If the returned value will fit inside a JavaScript Number without losing
- * precision, then a Number is returned, otherwise a String is returned.
- *
- * ```
- * var buf = ref.alloc('uint64');
- * ref.writeUInt64BE(buf, 0, '18446744073709551615');
- *
- * var val = ref.readUInt64BE(buf, 0)
- * console.log(val)
- * '18446744073709551615'
- * ```
- *
- * @param {Buffer} buffer The buffer to read a Buffer from.
- * @param {Number} offset The offset to begin reading from.
- * @return {Number|String} The Number or String that was read from _buffer_.
- * @name readUInt64BE
- * @type method
- */
-
-/**
- * Returns a little-endian unsigned 64-bit int read from _buffer_ at the given
- * _offset_.
- *
- * If the returned value will fit inside a JavaScript Number without losing
- * precision, then a Number is returned, otherwise a String is returned.
- *
- * ```
- * var buf = ref.alloc('uint64');
- * ref.writeUInt64LE(buf, 0, '18446744073709551615');
- *
- * var val = ref.readUInt64LE(buf, 0)
- * console.log(val)
- * '18446744073709551615'
- * ```
- *
- * @param {Buffer} buffer The buffer to read a Buffer from.
- * @param {Number} offset The offset to begin reading from.
- * @return {Number|String} The Number or String that was read from _buffer_.
- * @name readUInt64LE
- * @type method
- */
-
-/**
- * Writes the _input_ Number or String as a big-endian signed 64-bit int into
- * _buffer_ at the given _offset_.
- *
- * ```
- * var buf = ref.alloc('int64');
- * ref.writeInt64BE(buf, 0, '9223372036854775807');
- * ```
- *
- * @param {Buffer} buffer The buffer to write to.
- * @param {Number} offset The offset to begin writing from.
- * @param {Number|String} input This String or Number which gets written.
- * @name writeInt64BE
- * @type method
- */
-
-/**
- * Writes the _input_ Number or String as a little-endian signed 64-bit int into
- * _buffer_ at the given _offset_.
- *
- * ```
- * var buf = ref.alloc('int64');
- * ref.writeInt64LE(buf, 0, '9223372036854775807');
- * ```
- *
- * @param {Buffer} buffer The buffer to write to.
- * @param {Number} offset The offset to begin writing from.
- * @param {Number|String} input This String or Number which gets written.
- * @name writeInt64LE
- * @type method
- */
-
-/**
- * Writes the _input_ Number or String as a big-endian unsigned 64-bit int into
- * _buffer_ at the given _offset_.
- *
- * ```
- * var buf = ref.alloc('uint64');
- * ref.writeUInt64BE(buf, 0, '18446744073709551615');
- * ```
- *
- * @param {Buffer} buffer The buffer to write to.
- * @param {Number} offset The offset to begin writing from.
- * @param {Number|String} input This String or Number which gets written.
- * @name writeUInt64BE
- * @type method
- */
-
-/**
- * Writes the _input_ Number or String as a little-endian unsigned 64-bit int
- * into _buffer_ at the given _offset_.
- *
- * ```
- * var buf = ref.alloc('uint64');
- * ref.writeUInt64LE(buf, 0, '18446744073709551615');
- * ```
- *
- * @param {Buffer} buffer The buffer to write to.
- * @param {Number} offset The offset to begin writing from.
- * @param {Number|String} input This String or Number which gets written.
- * @name writeUInt64LE
- * @type method
- */
-
-/**
- * Returns a new clone of the given "type" object, with its
- * `indirection` level incremented by **1**.
- *
- * Say you wanted to create a type representing a `void *`:
- *
- * ```
- * var voidPtrType = ref.refType(ref.types.void);
- * ```
- *
- * @param {Object|String} type The "type" object to create a reference type from. Strings get coerced first.
- * @return {Object} The new "type" object with its `indirection` incremented by 1.
- */
-
-exports.refType = function refType (type) {
-  var _type = exports.coerceType(type)
-  var rtn = Object.create(_type)
-  rtn.indirection++
-  if (_type.name) {
-    rtn.name = _type.name + '*'
-  }
-  return rtn
-}
-
-/**
- * Returns a new clone of the given "type" object, with its
- * `indirection` level decremented by 1.
- *
- * @param {Object|String} type The "type" object to create a dereference type from. Strings get coerced first.
- * @return {Object} The new "type" object with its `indirection` decremented by 1.
- */
-
-exports.derefType = function derefType (type) {
-  var _type = exports.coerceType(type)
-  if (_type.indirection === 1) {
-    throw new Error('Cannot create deref\'d type for type with indirection 1')
-  }
-  var rtn = Object.getPrototypeOf(_type)
-  if (rtn.indirection !== _type.indirection - 1) {
-    // slow case
-    rtn = Object.create(_type)
-    rtn.indirection--
-  }
-  return rtn
-}
-
-/**
- * Coerces a "type" object from a String or an actual "type" object. String values
- * are looked up from the `ref.types` Object. So:
- *
- *   * `"int"` gets coerced into `ref.types.int`.
- *   * `"int *"` gets translated into `ref.refType(ref.types.int)`
- *   * `ref.types.int` gets translated into `ref.types.int` (returns itself)
- *
- * Throws an Error if no valid "type" object could be determined. Most `ref`
- * functions use this function under the hood, so anywhere a "type" object is
- * expected, a String may be passed as well, including simply setting the
- * `buffer.type` property.
- *
- * ```
- * var type = ref.coerceType('int **');
- *
- * console.log(type.indirection);
- * 3
- * ```
- *
- * @param {Object|String} type The "type" Object or String to coerce.
- * @return {Object} A "type" object
- */
-
-exports.coerceType = function coerceType (type) {
-  var rtn = type
-  if (typeof rtn === 'string') {
-    rtn = exports.types[type]
-    if (rtn) return rtn
-
-    // strip whitespace
-    rtn = type.replace(/\s+/g, '').toLowerCase()
-    if (rtn === 'pointer') {
-      // legacy "pointer" being used :(
-      rtn = exports.refType(exports.types.void) // void *
-    } else if (rtn === 'string') {
-      rtn = exports.types.CString // special char * type
-    } else {
-      var refCount = 0
-      rtn = rtn.replace(/\*/g, function () {
-        refCount++
-        return ''
-      })
-      // allow string names to be passed in
-      rtn = exports.types[rtn]
-      if (refCount > 0) {
-        if (!(rtn && 'size' in rtn && 'indirection' in rtn)) {
-          throw new TypeError('could not determine a proper "type" from: ' + JSON.stringify(type))
-        }
-        for (var i = 0; i < refCount; i++) {
-          rtn = exports.refType(rtn)
-        }
-      }
-    }
-  }
-  if (!(rtn && 'size' in rtn && 'indirection' in rtn)) {
-    throw new TypeError('could not determine a proper "type" from: ' + JSON.stringify(type))
-  }
-  return rtn
-}
-
-/**
- * Returns the "type" property of the given Buffer.
- * Creates a default type for the buffer when none exists.
- *
- * @param {Buffer} buffer The Buffer instance to get the "type" object from.
- * @return {Object} The "type" object from the given Buffer.
- */
-
-exports.getType = function getType (buffer) {
-  if (!buffer.type) {
-    debug('WARN: no "type" found on buffer, setting default "type"', buffer)
-    buffer.type = {}
-    buffer.type.size = buffer.length
-    buffer.type.indirection = 1
-    buffer.type.get = function get () {
-      throw new Error('unknown "type"; cannot get()')
-    }
-    buffer.type.set = function set () {
-      throw new Error('unknown "type"; cannot set()')
-    }
-  }
-  return exports.coerceType(buffer.type)
-}
-
-/**
- * Calls the `get()` function of the Buffer's current "type" (or the
- * passed in _type_ if present) at the given _offset_.
- *
- * This function handles checking the "indirection" level and returning a
- * proper "dereferenced" Bufffer instance when necessary.
- *
- * @param {Buffer} buffer The Buffer instance to read from.
- * @param {Number} offset (optional) The offset on the Buffer to start reading from. Defaults to 0.
- * @param {Object|String} type (optional) The "type" object to use when reading. Defaults to calling `getType()` on the buffer.
- * @return {?} Whatever value the "type" used when reading returns.
- */
-
-exports.get = function get (buffer, offset, type) {
-  if (!offset) {
-    offset = 0
-  }
-  if (type) {
-    type = exports.coerceType(type)
-  } else {
-    type = exports.getType(buffer)
-  }
-  debug('get(): (offset: %d)', offset, buffer)
-  assert(type.indirection > 0, '"indirection" level must be at least 1')
-  if (type.indirection === 1) {
-    // need to check "type"
-    return type.get(buffer, offset)
-  } else {
-    // need to create a deref'd Buffer
-    var size = type.indirection === 2 ? type.size : exports.sizeof.pointer
-    var reference = exports.readPointer(buffer, offset, size)
-    reference.type = exports.derefType(type)
-    return reference
-  }
-}
-
-/**
- * Calls the `set()` function of the Buffer's current "type" (or the
- * passed in _type_ if present) at the given _offset_.
- *
- * This function handles checking the "indirection" level writing a pointer rather
- * than calling the `set()` function if the indirection is greater than 1.
- *
- * @param {Buffer} buffer The Buffer instance to write to.
- * @param {Number} offset The offset on the Buffer to start writing to.
- * @param {?} value The value to write to the Buffer instance.
- * @param {Object|String} type (optional) The "type" object to use when reading. Defaults to calling `getType()` on the buffer.
- */
-
-exports.set = function set (buffer, offset, value, type) {
-  if (!offset) {
-    offset = 0
-  }
-  if (type) {
-    type = exports.coerceType(type)
-  } else {
-    type = exports.getType(buffer)
-  }
-  debug('set(): (offset: %d)', offset, buffer, value)
-  assert(type.indirection >= 1, '"indirection" level must be at least 1')
-  if (type.indirection === 1) {
-    type.set(buffer, offset, value)
-  } else {
-    exports.writePointer(buffer, offset, value)
-  }
-}
-
-
-/**
- * Returns a new Buffer instance big enough to hold `type`,
- * with the given `value` written to it.
- *
- * ``` js
- * var intBuf = ref.alloc(ref.types.int)
- * var int_with_4 = ref.alloc(ref.types.int, 4)
- * ```
- *
- * @param {Object|String} type The "type" object to allocate. Strings get coerced first.
- * @param {?} value (optional) The initial value set on the returned Buffer, using _type_'s `set()` function.
- * @return {Buffer} A new Buffer instance with it's `type` set to "type", and (optionally) "value" written to it.
- */
-
-exports.alloc = function alloc (_type, value) {
-  var type = exports.coerceType(_type)
-  debug('allocating Buffer for type with "size"', type.size)
-  var size
-  if (type.indirection === 1) {
-    size = type.size
-  } else {
-    size = exports.sizeof.pointer
-  }
-  var buffer = new Buffer(size)
-  buffer.type = type
-  if (arguments.length >= 2) {
-    debug('setting value on allocated buffer', value)
-    exports.set(buffer, 0, value, type)
-  }
-  return buffer
-}
-
-/**
- * Returns a new `Buffer` instance with the given String written to it with the
- * given encoding (defaults to __'utf8'__). The buffer is 1 byte longer than the
- * string itself, and is NUL terminated.
- *
- * ```
- * var buf = ref.allocCString('hello world');
- *
- * console.log(buf.toString());
- * 'hello world\u0000'
- * ```
- *
- * @param {String} string The JavaScript string to be converted to a C string.
- * @param {String} encoding (optional) The encoding to use for the C string. Defaults to __'utf8'__.
- * @return {Buffer} The new `Buffer` instance with the specified String wrtten to it, and a trailing NUL byte.
- */
-
-exports.allocCString = function allocCString (string, encoding) {
-  if (null == string || (Buffer.isBuffer(string) && exports.isNull(string))) {
-    return exports.NULL
-  }
-  var size = Buffer.byteLength(string, encoding) + 1
-  var buffer = new Buffer(size)
-  exports.writeCString(buffer, 0, string, encoding)
-  buffer.type = charPtrType
-  return buffer
-}
-
-/**
- * Writes the given string as a C String (NULL terminated) to the given buffer
- * at the given offset. "encoding" is optional and defaults to __'utf8'__.
- *
- * Unlike `readCString()`, this function requires the buffer to actually have the
- * proper length.
- *
- * @param {Buffer} buffer The Buffer instance to write to.
- * @param {Number} offset The offset of the buffer to begin writing at.
- * @param {String} string The JavaScript String to write that will be written to the buffer.
- * @param {String} encoding (optional) The encoding to read the C string as. Defaults to __'utf8'__.
- */
-
-exports.writeCString = function writeCString (buffer, offset, string, encoding) {
-  assert(Buffer.isBuffer(buffer), 'expected a Buffer as the first argument')
-  assert.equal('string', typeof string, 'expected a "string" as the third argument')
-  if (!offset) {
-    offset = 0
-  }
-  if (!encoding) {
-    encoding = 'utf8'
-  }
-  var size = buffer.length - offset
-  var len = buffer.write(string, offset, size, encoding)
-  buffer.writeUInt8(0, offset + len)  // NUL terminate
-}
-
-exports['readInt64' + exports.endianness] = exports.readInt64
-exports['readUInt64' + exports.endianness] = exports.readUInt64
-exports['writeInt64' + exports.endianness] = exports.writeInt64
-exports['writeUInt64' + exports.endianness] = exports.writeUInt64
-
-var opposite = exports.endianness == 'LE' ? 'BE' : 'LE'
-var int64temp = new Buffer(exports.sizeof.int64)
-var uint64temp = new Buffer(exports.sizeof.uint64)
-
-exports['readInt64' + opposite] = function (buffer, offset) {
-  for (var i = 0; i < exports.sizeof.int64; i++) {
-    int64temp[i] = buffer[offset + exports.sizeof.int64 - i - 1]
-  }
-  return exports.readInt64(int64temp, 0)
-}
-exports['readUInt64' + opposite] = function (buffer, offset) {
-  for (var i = 0; i < exports.sizeof.uint64; i++) {
-    uint64temp[i] = buffer[offset + exports.sizeof.uint64 - i - 1]
-  }
-  return exports.readUInt64(uint64temp, 0)
-}
-exports['writeInt64' + opposite] = function (buffer, offset, value) {
-  exports.writeInt64(int64temp, 0, value)
-  for (var i = 0; i < exports.sizeof.int64; i++) {
-    buffer[offset + i] = int64temp[exports.sizeof.int64 - i - 1]
-  }
-}
-exports['writeUInt64' + opposite] = function (buffer, offset, value) {
-  exports.writeUInt64(uint64temp, 0, value)
-  for (var i = 0; i < exports.sizeof.uint64; i++) {
-    buffer[offset + i] = uint64temp[exports.sizeof.uint64 - i - 1]
-  }
-}
-
-/**
- * `ref()` accepts a Buffer instance and returns a new Buffer
- * instance that is "pointer" sized and has its data pointing to the given
- * Buffer instance. Essentially the created Buffer is a "reference" to the
- * original pointer, equivalent to the following C code:
- *
- * ``` c
- * char *buf = buffer;
- * char **ref = &buf;
- * ```
- *
- * @param {Buffer} buffer A Buffer instance to create a reference to.
- * @return {Buffer} A new Buffer instance pointing to _buffer_.
- */
-
-exports.ref = function ref (buffer) {
-  debug('creating a reference to buffer', buffer)
-  var type = exports.refType(exports.getType(buffer))
-  return exports.alloc(type, buffer)
-}
-
-/**
- * Accepts a Buffer instance and attempts to "dereference" it.
- * That is, first it checks the `indirection` count of _buffer_'s "type", and if
- * it's greater than __1__ then it merely returns another Buffer, but with one
- * level less `indirection`.
- *
- * When _buffer_'s indirection is at __1__, then it checks for `buffer.type`
- * which should be an Object with its own `get()` function.
- *
- * ```
- * var buf = ref.alloc('int', 6);
- *
- * var val = ref.deref(buf);
- * console.log(val);
- * 6
- * ```
- *
- *
- * @param {Buffer} buffer A Buffer instance to dereference.
- * @return {?} The returned value after dereferencing _buffer_.
- */
-
-exports.deref = function deref (buffer) {
-  debug('dereferencing buffer', buffer)
-  return exports.get(buffer)
-}
-
-/**
- * Attaches _object_ to _buffer_ such that it prevents _object_ from being garbage
- * collected until _buffer_ does.
- *
- * @param {Buffer} buffer A Buffer instance to attach _object_ to.
- * @param {Object|Buffer} object An Object or Buffer to prevent from being garbage collected until _buffer_ does.
- * @api private
- */
-
-exports._attach = function _attach (buf, obj) {
-  if (!buf._refs) {
-    buf._refs = []
-  }
-  buf._refs.push(obj)
-}
-
-/**
- * Same as `ref.writeObject()`, except that this version does not _attach_ the
- * Object to the Buffer, which is potentially unsafe if the garbage collector
- * runs.
- *
- * @param {Buffer} buffer A Buffer instance to write _object_ to.
- * @param {Number} offset The offset on the Buffer to start writing at.
- * @param {Object} object The Object to be written into _buffer_.
- * @api private
- */
-
-exports._writeObject = exports.writeObject
-
-/**
- * Writes a pointer to _object_ into _buffer_ at the specified _offset.
- *
- * This function "attaches" _object_ to _buffer_ to prevent it from being garbage
- * collected.
- *
- * ```
- * var buf = ref.alloc('Object');
- * ref.writeObject(buf, 0, { foo: 'bar' });
- *
- * ```
- *
- * @param {Buffer} buffer A Buffer instance to write _object_ to.
- * @param {Number} offset The offset on the Buffer to start writing at.
- * @param {Object} object The Object to be written into _buffer_.
- */
-
-exports.writeObject = function writeObject (buf, offset, obj, persistent) {
-  debug('writing Object to buffer', buf, offset, obj, persistent)
-  exports._writeObject(buf, offset, obj, persistent)
-  exports._attach(buf, obj)
-}
-
-/**
- * Same as `ref.writePointer()`, except that this version does not attach
- * _pointer_ to _buffer_, which is potentially unsafe if the garbage collector
- * runs.
- *
- * @param {Buffer} buffer A Buffer instance to write _pointer to.
- * @param {Number} offset The offset on the Buffer to start writing at.
- * @param {Buffer} pointer The Buffer instance whose memory address will be written to _buffer_.
- * @api private
- */
-
-exports._writePointer = exports.writePointer
-
-/**
- * Writes the memory address of _pointer_ to _buffer_ at the specified _offset_.
- *
- * This function "attaches" _object_ to _buffer_ to prevent it from being garbage
- * collected.
- *
- * ```
- * var someBuffer = new Buffer('whatever');
- * var buf = ref.alloc('pointer');
- * ref.writePointer(buf, 0, someBuffer);
- * ```
- *
- * @param {Buffer} buffer A Buffer instance to write _pointer to.
- * @param {Number} offset The offset on the Buffer to start writing at.
- * @param {Buffer} pointer The Buffer instance whose memory address will be written to _buffer_.
- */
-
-exports.writePointer = function writePointer (buf, offset, ptr) {
-  debug('writing pointer to buffer', buf, offset, ptr)
-  exports._writePointer(buf, offset, ptr)
-  exports._attach(buf, ptr)
-}
-
-/**
- * Same as `ref.reinterpret()`, except that this version does not attach
- * _buffer_ to the returned Buffer, which is potentially unsafe if the
- * garbage collector runs.
- *
- * @param {Buffer} buffer A Buffer instance to base the returned Buffer off of.
- * @param {Number} size The `length` property of the returned Buffer.
- * @param {Number} offset The offset of the Buffer to begin from.
- * @return {Buffer} A new Buffer instance with the same memory address as _buffer_, and the requested _size_.
- * @api private
- */
-
-exports._reinterpret = exports.reinterpret
-
-/**
- * Returns a new Buffer instance with the specified _size_, with the same memory
- * address as _buffer_.
- *
- * This function "attaches" _buffer_ to the returned Buffer to prevent it from
- * being garbage collected.
- *
- * @param {Buffer} buffer A Buffer instance to base the returned Buffer off of.
- * @param {Number} size The `length` property of the returned Buffer.
- * @param {Number} offset The offset of the Buffer to begin from.
- * @return {Buffer} A new Buffer instance with the same memory address as _buffer_, and the requested _size_.
- */
-
-exports.reinterpret = function reinterpret (buffer, size, offset) {
-  debug('reinterpreting buffer to "%d" bytes', size)
-  var rtn = exports._reinterpret(buffer, size, offset || 0)
-  exports._attach(rtn, buffer)
-  return rtn
-}
-
-/**
- * Same as `ref.reinterpretUntilZeros()`, except that this version does not
- * attach _buffer_ to the returned Buffer, which is potentially unsafe if the
- * garbage collector runs.
- *
- * @param {Buffer} buffer A Buffer instance to base the returned Buffer off of.
- * @param {Number} size The number of sequential, aligned `NULL` bytes that are required to terminate the buffer.
- * @param {Number} offset The offset of the Buffer to begin from.
- * @return {Buffer} A new Buffer instance with the same memory address as _buffer_, and a variable `length` that is terminated by _size_ NUL bytes.
- * @api private
- */
-
-exports._reinterpretUntilZeros = exports.reinterpretUntilZeros
-
-/**
- * Accepts a `Buffer` instance and a number of `NULL` bytes to read from the
- * pointer. This function will scan past the boundary of the Buffer's `length`
- * until it finds `size` number of aligned `NULL` bytes.
- *
- * This is useful for finding the end of NUL-termintated array or C string. For
- * example, the `readCString()` function _could_ be implemented like:
- *
- * ```
- * function readCString (buf) {
- *   return ref.reinterpretUntilZeros(buf, 1).toString('utf8')
- * }
- * ```
- *
- * This function "attaches" _buffer_ to the returned Buffer to prevent it from
- * being garbage collected.
- *
- * @param {Buffer} buffer A Buffer instance to base the returned Buffer off of.
- * @param {Number} size The number of sequential, aligned `NULL` bytes are required to terminate the buffer.
- * @param {Number} offset The offset of the Buffer to begin from.
- * @return {Buffer} A new Buffer instance with the same memory address as _buffer_, and a variable `length` that is terminated by _size_ NUL bytes.
- */
-
-exports.reinterpretUntilZeros = function reinterpretUntilZeros (buffer, size, offset) {
-  debug('reinterpreting buffer to until "%d" NULL (0) bytes are found', size)
-  var rtn = exports._reinterpretUntilZeros(buffer, size, offset || 0)
-  exports._attach(rtn, buffer)
-  return rtn
-}
-
-
-// the built-in "types"
-var types = exports.types = {}
-
-/**
- * The `void` type.
- *
- * @section types
- */
-
-types.void = {
-    size: 0
-  , indirection: 1
-  , get: function get (buf, offset) {
-      debug('getting `void` type (returns `null`)')
-      return null
-    }
-  , set: function set (buf, offset, val) {
-      debug('setting `void` type (no-op)')
-    }
-}
-
-/**
- * The `int8` type.
- */
-
-types.int8 = {
-    size: exports.sizeof.int8
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf.readInt8(offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      if (typeof val === 'string') {
-        val = val.charCodeAt(0)
-      }
-      return buf.writeInt8(val, offset || 0)
-    }
-}
-
-/**
- * The `uint8` type.
- */
-
-types.uint8 = {
-    size: exports.sizeof.uint8
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf.readUInt8(offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      if (typeof val === 'string') {
-        val = val.charCodeAt(0)
-      }
-      return buf.writeUInt8(val, offset || 0)
-    }
-}
-
-/**
- * The `int16` type.
- */
-
-types.int16 = {
-    size: exports.sizeof.int16
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readInt16' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeInt16' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `uint16` type.
- */
-
-types.uint16 = {
-    size: exports.sizeof.uint16
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readUInt16' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeUInt16' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `int32` type.
- */
-
-types.int32 = {
-    size: exports.sizeof.int32
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readInt32' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeInt32' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `uint32` type.
- */
-
-types.uint32 = {
-    size: exports.sizeof.uint32
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readUInt32' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeUInt32' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `int64` type.
- */
-
-types.int64 = {
-    size: exports.sizeof.int64
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readInt64' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeInt64' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `uint64` type.
- */
-
-types.uint64 = {
-    size: exports.sizeof.uint64
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readUInt64' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeUInt64' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `float` type.
- */
-
-types.float = {
-    size: exports.sizeof.float
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readFloat' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeFloat' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `double` type.
- */
-
-types.double = {
-    size: exports.sizeof.double
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf['readDouble' + exports.endianness](offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf['writeDouble' + exports.endianness](val, offset || 0)
-    }
-}
-
-/**
- * The `Object` type. This can be used to read/write regular JS Objects
- * into raw memory.
- */
-
-types.Object = {
-    size: exports.sizeof.Object
-  , indirection: 1
-  , get: function get (buf, offset) {
-      return buf.readObject(offset || 0)
-    }
-  , set: function set (buf, offset, val) {
-      return buf.writeObject(val, offset || 0)
-    }
-}
-
-/**
- * The `CString` (a.k.a `"string"`) type.
- *
- * CStrings are a kind of weird thing. We say it's `sizeof(char *)`, and
- * `indirection` level of 1, which means that we have to return a Buffer that
- * is pointer sized, and points to a some utf8 string data, so we have to create
- * a 2nd "in-between" buffer.
- */
-
-types.CString = {
-    size: exports.sizeof.pointer
-  , alignment: exports.alignof.pointer
-  , indirection: 1
-  , get: function get (buf, offset) {
-      var _buf = exports.readPointer(buf, offset)
-      if (exports.isNull(_buf)) {
-        return null
-      }
-      return exports.readCString(_buf, 0)
-    }
-  , set: function set (buf, offset, val) {
-      var _buf
-      if (Buffer.isBuffer(val)) {
-        _buf = val
-      } else {
-        // assume string
-        _buf = exports.allocCString(val)
-      }
-      return exports.writePointer(buf, offset, _buf)
-    }
-}
-
-// alias Utf8String
-var utfstringwarned = false
-Object.defineProperty(types, 'Utf8String', {
-    enumerable: false
-  , configurable: true
-  , get: function () {
-      if (!utfstringwarned) {
-        utfstringwarned = true
-        console.error('"Utf8String" type is deprecated, use "CString" instead')
-      }
-      return types.CString
-    }
-})
-
-/**
- * The `bool` type.
- *
- * Wrapper type around `types.uint8` that accepts/returns `true` or
- * `false` Boolean JavaScript values.
- *
- * @name bool
- *
- */
-
-/**
- * The `byte` type.
- *
- * @name byte
- */
-
-/**
- * The `char` type.
- *
- * @name char
- */
-
-/**
- * The `uchar` type.
- *
- * @name uchar
- */
-
-/**
- * The `short` type.
- *
- * @name short
- */
-
-/**
- * The `ushort` type.
- *
- * @name ushort
- */
-
-/**
- * The `int` type.
- *
- * @name int
- */
-
-/**
- * The `uint` type.
- *
- * @name uint
- */
-
-/**
- * The `long` type.
- *
- * @name long
- */
-
-/**
- * The `ulong` type.
- *
- * @name ulong
- */
-
-/**
- * The `longlong` type.
- *
- * @name longlong
- */
-
-/**
- * The `ulonglong` type.
- *
- * @name ulonglong
- */
-
-/**
- * The `size_t` type.
- *
- * @name size_t
- */
-
-// "typedef"s for the variable-sized types
-;[ 'bool', 'byte', 'char', 'uchar', 'short', 'ushort', 'int', 'uint', 'long'
-, 'ulong', 'longlong', 'ulonglong', 'size_t' ].forEach(function (name) {
-  var unsigned = name === 'bool'
-              || name === 'byte'
-              || name === 'size_t'
-              || name[0] === 'u'
-  var size = exports.sizeof[name]
-  assert(size >= 1 && size <= 8)
-  var typeName = 'int' + (size * 8)
-  if (unsigned) {
-    typeName = 'u' + typeName
-  }
-  var type = exports.types[typeName]
-  assert(type)
-  exports.types[name] = Object.create(type)
-})
-
-// set the "alignment" property on the built-in types
-Object.keys(exports.alignof).forEach(function (name) {
-  if (name === 'pointer') return
-  exports.types[name].alignment = exports.alignof[name]
-  assert(exports.types[name].alignment > 0)
-})
-
-// make the `bool` type work with JS true/false values
-exports.types.bool.get = (function (_get) {
-  return function get (buf, offset) {
-    return _get(buf, offset) ? true : false
-  }
-})(exports.types.bool.get)
-exports.types.bool.set = (function (_set) {
-  return function set (buf, offset, val) {
-    if (typeof val !== 'number') {
-      val = val ? 1 : 0
-    }
-    return _set(buf, offset, val)
-  }
-})(exports.types.bool.set)
-
-/*!
- * Set the `name` property of the types. Used for debugging...
- */
-
-Object.keys(exports.types).forEach(function (name) {
-  exports.types[name].name = name
-})
-
-/*!
- * This `char *` type is used by "allocCString()" above.
- */
-
-var charPtrType = exports.refType(exports.types.char)
-
-/*!
- * Set the `type` property of the `NULL` pointer Buffer object.
- */
-
-exports.NULL.type = exports.types.void
-
-/**
- * `NULL_POINTER` is a pointer-sized `Buffer` instance pointing to `NULL`.
- * Conceptually, it's equivalent to the following C code:
- *
- * ``` c
- * char *null_pointer;
- * null_pointer = NULL;
- * ```
- *
- * @type Buffer
- */
-
-exports.NULL_POINTER = exports.ref(exports.NULL)
-
-/**
- * All these '...' comment blocks below are for the documentation generator.
- *
- * @section buffer
- */
-
-Buffer.prototype.address = function address () {
-  return exports.address(this, 0)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.hexAddress = function hexAddress () {
-  return exports.hexAddress(this, 0)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.isNull = function isNull () {
-  return exports.isNull(this, 0)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.ref = function ref () {
-  return exports.ref(this)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.deref = function deref () {
-  return exports.deref(this)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readObject = function readObject (offset) {
-  return exports.readObject(this, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writeObject = function writeObject (obj, offset) {
-  return exports.writeObject(this, offset, obj)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readPointer = function readPointer (offset, size) {
-  return exports.readPointer(this, offset, size)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writePointer = function writePointer (ptr, offset) {
-  return exports.writePointer(this, offset, ptr)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readCString = function readCString (offset) {
-  return exports.readCString(this, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writeCString = function writeCString (string, offset, encoding) {
-  return exports.writeCString(this, offset, string, encoding)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readInt64BE = function readInt64BE (offset) {
-  return exports.readInt64BE(this, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writeInt64BE = function writeInt64BE (val, offset) {
-  return exports.writeInt64BE(this, offset, val)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readUInt64BE = function readUInt64BE (offset) {
-  return exports.readUInt64BE(this, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writeUInt64BE = function writeUInt64BE (val, offset) {
-  return exports.writeUInt64BE(this, offset, val)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readInt64LE = function readInt64LE (offset) {
-  return exports.readInt64LE(this, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writeInt64LE = function writeInt64LE (val, offset) {
-  return exports.writeInt64LE(this, offset, val)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.readUInt64LE = function readUInt64LE (offset) {
-  return exports.readUInt64LE(this, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.writeUInt64LE = function writeUInt64LE (val, offset) {
-  return exports.writeUInt64LE(this, offset, val)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.reinterpret = function reinterpret (size, offset) {
-  return exports.reinterpret(this, size, offset)
-}
-
-/**
- * ...
- */
-
-Buffer.prototype.reinterpretUntilZeros = function reinterpretUntilZeros (size, offset) {
-  return exports.reinterpretUntilZeros(this, size, offset)
-}
-
-/**
- * `ref` overwrites the default `Buffer#inspect()` function to include the
- * hex-encoded memory address of the Buffer instance when invoked.
- *
- * This is simply a nice-to-have.
- *
- * **Before**:
- *
- * ``` js
- * console.log(new Buffer('ref'));
- * <Buffer 72 65 66>
- * ```
- *
- * **After**:
- *
- * ``` js
- * console.log(new Buffer('ref'));
- * <Buffer@0x103015490 72 65 66>
- * ```
- */
-
-Buffer.prototype.inspect = overwriteInspect(Buffer.prototype.inspect)
-
-// does SlowBuffer inherit from Buffer? (node >= v0.7.9)
-if (!(exports.NULL instanceof Buffer)) {
-  debug('extending SlowBuffer\'s prototype since it doesn\'t inherit from Buffer.prototype')
-
-  /*!
-   * SlowBuffer convenience methods.
-   */
-
-  var SlowBuffer = require('buffer').SlowBuffer
-
-  SlowBuffer.prototype.address = Buffer.prototype.address
-  SlowBuffer.prototype.hexAddress = Buffer.prototype.hexAddress
-  SlowBuffer.prototype.isNull = Buffer.prototype.isNull
-  SlowBuffer.prototype.ref = Buffer.prototype.ref
-  SlowBuffer.prototype.deref = Buffer.prototype.deref
-  SlowBuffer.prototype.readObject = Buffer.prototype.readObject
-  SlowBuffer.prototype.writeObject = Buffer.prototype.writeObject
-  SlowBuffer.prototype.readPointer = Buffer.prototype.readPointer
-  SlowBuffer.prototype.writePointer = Buffer.prototype.writePointer
-  SlowBuffer.prototype.readCString = Buffer.prototype.readCString
-  SlowBuffer.prototype.writeCString = Buffer.prototype.writeCString
-  SlowBuffer.prototype.reinterpret = Buffer.prototype.reinterpret
-  SlowBuffer.prototype.reinterpretUntilZeros = Buffer.prototype.reinterpretUntilZeros
-  SlowBuffer.prototype.readInt64BE = Buffer.prototype.readInt64BE
-  SlowBuffer.prototype.writeInt64BE = Buffer.prototype.writeInt64BE
-  SlowBuffer.prototype.readUInt64BE = Buffer.prototype.readUInt64BE
-  SlowBuffer.prototype.writeUInt64BE = Buffer.prototype.writeUInt64BE
-  SlowBuffer.prototype.readInt64LE = Buffer.prototype.readInt64LE
-  SlowBuffer.prototype.writeInt64LE = Buffer.prototype.writeInt64LE
-  SlowBuffer.prototype.readUInt64LE = Buffer.prototype.readUInt64LE
-  SlowBuffer.prototype.writeUInt64LE = Buffer.prototype.writeUInt64LE
-  SlowBuffer.prototype.inspect = overwriteInspect(SlowBuffer.prototype.inspect)
-}
-
-function overwriteInspect (inspect) {
-  if (inspect.name === 'refinspect') {
-    return inspect
-  } else {
-    return function refinspect () {
-      var v = inspect.apply(this, arguments)
-      return v.replace('Buffer', 'Buffer@0x' + this.hexAddress())
-    }
-  }
-}
-
-}).call(this,require("buffer").Buffer)
-},{"assert":7,"bindings":36,"buffer":8,"debug":37}],42:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -20178,7 +15778,7 @@ function overwriteInspect (inspect) {
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /* global define */
 
 (function (root, pluralize) {
@@ -20613,7 +16213,7 @@ function overwriteInspect (inspect) {
   return pluralize;
 });
 
-},{}],44:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*
 Copyright (c) 2011, Rob Ellis, Chris Umbel
 
@@ -20788,7 +16388,7 @@ Sentences.prototype.type = function(callback) {
 
 module.exports = Sentences;
 
-},{"underscore":136}],45:[function(require,module,exports){
+},{"underscore":112}],21:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -20848,7 +16448,7 @@ BayesClassifier.load = load;
 
 module.exports = BayesClassifier;
 
-},{"../stemmers/porter_stemmer":72,"./classifier":46,"apparatus":128,"util":18}],46:[function(require,module,exports){
+},{"../stemmers/porter_stemmer":48,"./classifier":22,"apparatus":104,"util":16}],22:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -21017,7 +16617,7 @@ Classifier.load = load;
 
 module.exports = Classifier;
 
-},{"../stemmers/porter_stemmer":72,"events":12,"fs":6,"util":18}],47:[function(require,module,exports){
+},{"../stemmers/porter_stemmer":48,"events":11,"fs":6,"util":16}],23:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -21079,7 +16679,7 @@ LogisticRegressionClassifier.load = load;
 
 module.exports = LogisticRegressionClassifier;
 
-},{"../stemmers/porter_stemmer":72,"./classifier":46,"apparatus":128,"util":18}],48:[function(require,module,exports){
+},{"../stemmers/porter_stemmer":48,"./classifier":22,"apparatus":104,"util":16}],24:[function(require,module,exports){
 /*
 Copyright (c) 2011, John Crepezzi, Chris Umbel
 
@@ -21150,7 +16750,7 @@ var compare = function (str1, str2) {
 
 module.exports = compare;
 
-},{}],49:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 /*
 Copyright (c) 2012, Adam Phillabaum, Chris Umbel
 
@@ -21263,7 +16863,7 @@ function JaroWinklerDistance(s1, s2, dj) {
 }
 module.exports = JaroWinklerDistance;
 
-},{}],50:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 /*
 Copyright (c) 2012, Sid Nallu, Chris Umbel
 
@@ -21333,7 +16933,7 @@ function LevenshteinDistance (source, target, options) {
 
 module.exports = LevenshteinDistance;
 
-},{}],51:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -21410,7 +17010,7 @@ exports.normalize_ja = require('./normalizers/normalizer_ja').normalize_ja;
 exports.removeDiacritics = require('./normalizers/remove_diacritics');
 exports.transliterate_ja = require('./transliterators/ja');
 
-},{"./analyzers/sentence_analyzer":44,"./classifiers/bayes_classifier":45,"./classifiers/logistic_regression_classifier":47,"./distance/dice_coefficient":48,"./distance/jaro-winkler_distance":49,"./distance/levenshtein_distance":50,"./inflectors/count_inflector":52,"./inflectors/fr/noun_inflector":54,"./inflectors/ja/noun_inflector":55,"./inflectors/noun_inflector":56,"./inflectors/present_verb_inflector":57,"./ngrams/ngrams":59,"./ngrams/ngrams_zh":60,"./normalizers/normalizer":61,"./normalizers/normalizer_ja":62,"./normalizers/remove_diacritics":64,"./phonetics/dm_soundex":65,"./phonetics/double_metaphone":66,"./phonetics/metaphone":67,"./phonetics/soundex":69,"./stemmers/lancaster_stemmer":71,"./stemmers/porter_stemmer":72,"./stemmers/porter_stemmer_es":73,"./stemmers/porter_stemmer_fa":74,"./stemmers/porter_stemmer_fr":75,"./stemmers/porter_stemmer_it":76,"./stemmers/porter_stemmer_no":77,"./stemmers/porter_stemmer_ru":78,"./stemmers/stemmer_fr":82,"./stemmers/stemmer_ja":84,"./stemmers/stemmer_pl":86,"./tfidf/tfidf":88,"./tokenizers/aggressive_tokenizer":89,"./tokenizers/aggressive_tokenizer_es":90,"./tokenizers/aggressive_tokenizer_fa":91,"./tokenizers/aggressive_tokenizer_it":93,"./tokenizers/aggressive_tokenizer_nl":94,"./tokenizers/aggressive_tokenizer_no":95,"./tokenizers/aggressive_tokenizer_pl":96,"./tokenizers/aggressive_tokenizer_pt":97,"./tokenizers/aggressive_tokenizer_ru":98,"./tokenizers/regexp_tokenizer":99,"./tokenizers/tokenizer_ja":101,"./tokenizers/treebank_word_tokenizer":102,"./transliterators/ja":103,"./trie/trie":104,"./util/edge_weighted_digraph":106,"./util/longest_path_tree":107,"./util/shortest_path_tree":108,"./util/stopwords":109,"./wordnet/wordnet":122}],52:[function(require,module,exports){
+},{"./analyzers/sentence_analyzer":20,"./classifiers/bayes_classifier":21,"./classifiers/logistic_regression_classifier":23,"./distance/dice_coefficient":24,"./distance/jaro-winkler_distance":25,"./distance/levenshtein_distance":26,"./inflectors/count_inflector":28,"./inflectors/fr/noun_inflector":30,"./inflectors/ja/noun_inflector":31,"./inflectors/noun_inflector":32,"./inflectors/present_verb_inflector":33,"./ngrams/ngrams":35,"./ngrams/ngrams_zh":36,"./normalizers/normalizer":37,"./normalizers/normalizer_ja":38,"./normalizers/remove_diacritics":40,"./phonetics/dm_soundex":41,"./phonetics/double_metaphone":42,"./phonetics/metaphone":43,"./phonetics/soundex":45,"./stemmers/lancaster_stemmer":47,"./stemmers/porter_stemmer":48,"./stemmers/porter_stemmer_es":49,"./stemmers/porter_stemmer_fa":50,"./stemmers/porter_stemmer_fr":51,"./stemmers/porter_stemmer_it":52,"./stemmers/porter_stemmer_no":53,"./stemmers/porter_stemmer_ru":54,"./stemmers/stemmer_fr":58,"./stemmers/stemmer_ja":60,"./stemmers/stemmer_pl":62,"./tfidf/tfidf":64,"./tokenizers/aggressive_tokenizer":65,"./tokenizers/aggressive_tokenizer_es":66,"./tokenizers/aggressive_tokenizer_fa":67,"./tokenizers/aggressive_tokenizer_it":69,"./tokenizers/aggressive_tokenizer_nl":70,"./tokenizers/aggressive_tokenizer_no":71,"./tokenizers/aggressive_tokenizer_pl":72,"./tokenizers/aggressive_tokenizer_pt":73,"./tokenizers/aggressive_tokenizer_ru":74,"./tokenizers/regexp_tokenizer":75,"./tokenizers/tokenizer_ja":77,"./tokenizers/treebank_word_tokenizer":78,"./transliterators/ja":79,"./trie/trie":80,"./util/edge_weighted_digraph":82,"./util/longest_path_tree":83,"./util/shortest_path_tree":84,"./util/stopwords":85,"./wordnet/wordnet":98}],28:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -21466,7 +17066,7 @@ CountInflector.nth = nth;
 
 module.exports = CountInflector;
 
-},{}],53:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -21496,7 +17096,7 @@ var FormSet = function() {
 
 module.exports = FormSet;
 
-},{}],54:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*
  Copyright (c) 2012, Guillaume Marty
 
@@ -21733,7 +17333,7 @@ util.inherits(NounInflector, SingularPluralInflector);
 
 module.exports = NounInflector;
 
-},{"../form_set":53,"../singular_plural_inflector":58,"util":18}],55:[function(require,module,exports){
+},{"../form_set":29,"../singular_plural_inflector":34,"util":16}],31:[function(require,module,exports){
 /*
  Copyright (c) 2012, Guillaume Marty
 
@@ -21870,7 +17470,7 @@ util.inherits(NounInflector, SingularPluralInflector);
 
 module.exports = NounInflector;
 
-},{"../form_set":53,"../singular_plural_inflector":58,"util":18}],56:[function(require,module,exports){
+},{"../form_set":29,"../singular_plural_inflector":34,"util":16}],32:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -21977,7 +17577,7 @@ util.inherits(NounInflector, SingularPluralInflector);
     
 module.exports = NounInflector;
 
-},{"./form_set":53,"./singular_plural_inflector":58,"util":18}],57:[function(require,module,exports){
+},{"./form_set":29,"./singular_plural_inflector":34,"util":16}],33:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -22053,7 +17653,7 @@ util.inherits(VerbInflector, SingularPluralInflector);
 
 module.exports = VerbInflector;
 
-},{"./form_set":53,"./singular_plural_inflector":58,"util":18}],58:[function(require,module,exports){
+},{"./form_set":29,"./singular_plural_inflector":34,"util":16}],34:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -22164,7 +17764,7 @@ TenseInflector.prototype.izeRegExps = function(token, forms) {
 
 module.exports = TenseInflector;
 
-},{}],59:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /*
 Copyright (c) 2011, Rob Ellis, Chris Umbel
 
@@ -22257,7 +17857,7 @@ var ngrams = function(sequence, n, startSymbol, endSymbol) {
 }
 
 
-},{"../tokenizers/regexp_tokenizer":99,"underscore":136}],60:[function(require,module,exports){
+},{"../tokenizers/regexp_tokenizer":75,"underscore":112}],36:[function(require,module,exports){
 /*
 Copyright (c) 2014, Lee Wenzhu
 
@@ -22342,7 +17942,7 @@ var ngrams = function(sequence, n, startSymbol, endSymbol) {
 };
 
 
-},{"underscore":136}],61:[function(require,module,exports){
+},{"underscore":112}],37:[function(require,module,exports){
 /*
  Copyright (c) 2013, Kenneth Koch
 
@@ -22439,7 +18039,7 @@ exports.normalize_tokens = normalize_tokens;
 
 
 
-},{"../util/utils":119}],62:[function(require,module,exports){
+},{"../util/utils":95}],38:[function(require,module,exports){
 /*
  Copyright (c) 2012, Guillaume Marty
 
@@ -23065,7 +18665,7 @@ var normalize_ja = function(str) {
 exports.normalize_ja = normalize_ja;
 exports.converters = converters;
 
-},{"../util/utils":119,"../util/utils.js":119}],63:[function(require,module,exports){
+},{"../util/utils":95,"../util/utils.js":95}],39:[function(require,module,exports){
 /*
  Copyright (c) 2014, Kristoffer Brabrand
 
@@ -23125,7 +18725,7 @@ var remove_diacritics = function(text) {
 
 // export the relevant stuff.
 exports.remove_diacritics = remove_diacritics;
-},{}],64:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /*
  Copyright (c) 2012, Alexy Maslennikov
 
@@ -23248,7 +18848,7 @@ module.exports = function(str) {
 	return str;
 };
 
-},{}],65:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /*
 Copyright (c) 2012, Alexy Maslenninkov
 
@@ -23497,7 +19097,7 @@ soundex.process = process;
 module.exports = soundex;
 
 
-},{"./phonetic":68}],66:[function(require,module,exports){
+},{"./phonetic":44}],42:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -24005,7 +19605,7 @@ DoubleMetaphone.compare = compare
 DoubleMetaphone.process = process;
 DoubleMetaphone.isVowel = isVowel;
 
-},{"./phonetic":68}],67:[function(require,module,exports){
+},{"./phonetic":44}],43:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -24195,7 +19795,7 @@ Metaphone.dropY = dropY;
 Metaphone.transformZ = transformZ;
 Metaphone.dropVowels = dropVowels;
 
-},{"./phonetic":68}],68:[function(require,module,exports){
+},{"./phonetic":44}],44:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -24251,7 +19851,7 @@ module.exports = function() {
     };
 };
 
-},{"../tokenizers/aggressive_tokenizer":89,"../util/stopwords":109}],69:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer":65,"../util/stopwords":85}],45:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -24333,7 +19933,7 @@ SoundEx.transformR = transformR;
 SoundEx.condense = condense;
 SoundEx.padRight0 = padRight0;
 
-},{"./phonetic":68}],70:[function(require,module,exports){
+},{"./phonetic":44}],46:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -25125,7 +20725,7 @@ exports.rules = {
 };
 
 
-},{}],71:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -25201,7 +20801,7 @@ module.exports = LancasterStemmer;
 LancasterStemmer.stem = function(token) {
     return applyRuleSection(token.toLowerCase(), true);
 }
-},{"./lancaster_rules":70,"./stemmer":79}],72:[function(require,module,exports){
+},{"./lancaster_rules":46,"./stemmer":55}],48:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -25408,7 +21008,7 @@ PorterStemmer.step4 = step4;
 PorterStemmer.step5a = step5a;
 PorterStemmer.step5b = step5b;
 
-},{"./stemmer":79}],73:[function(require,module,exports){
+},{"./stemmer":55}],49:[function(require,module,exports){
 /*
 Copyright (c) 2012, David Przybilla, Chris Umbel
 
@@ -25631,7 +21231,7 @@ PorterStemmer.stem = function(token) {
 
 };
 
-},{"./stemmer_es":80}],74:[function(require,module,exports){
+},{"./stemmer_es":56}],50:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 Farsi Porter Stemmer by Fardin Koochaki <me@fardinak.com>
@@ -25665,7 +21265,7 @@ module.exports = PorterStemmer;
 PorterStemmer.stem = function(token) {
     return token;
 };
-},{"./stemmer_fa":81}],75:[function(require,module,exports){
+},{"./stemmer_fa":57}],51:[function(require,module,exports){
 'use strict';
 
 /*
@@ -26043,7 +21643,7 @@ function endsin(token, suffix) {
   if (token.length < suffix.length) return false;
   return (token.slice(-suffix.length) == suffix);
 };
-},{"./stemmer_fr":82}],76:[function(require,module,exports){
+},{"./stemmer_fr":58}],52:[function(require,module,exports){
 /*
 Copyright (c) 2012, Leonardo Fenu, Chris Umbel
 
@@ -26277,7 +21877,7 @@ PorterStemmer.stem = function(token) {
 	return token.toLowerCase();
 
 };
-},{"./stemmer_it":83}],77:[function(require,module,exports){
+},{"./stemmer_it":59}],53:[function(require,module,exports){
 /*
 Copyright (c) 2014, Kristoffer Brabrand
 
@@ -26433,7 +22033,7 @@ PorterStemmer.step1b = step1b;
 PorterStemmer.step1c = step1c;
 PorterStemmer.step2  = step2;
 PorterStemmer.step3  = step3;
-},{"./stemmer_no":85}],78:[function(require,module,exports){
+},{"./stemmer_no":61}],54:[function(require,module,exports){
 /*
 Copyright (c) 2012, Polyakov Vladimir, Chris Umbel
 
@@ -26586,7 +22186,7 @@ PorterStemmer.stem = function(token) {
 	return head + superlativeResult;
 };
 
-},{"./stemmer_ru":87}],79:[function(require,module,exports){
+},{"./stemmer_ru":63}],55:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -26649,7 +22249,7 @@ module.exports = function() {
     };
 }
 
-},{"../tokenizers/aggressive_tokenizer":89,"../util/stopwords":109}],80:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer":65,"../util/stopwords":85}],56:[function(require,module,exports){
 /*
 Copyright (c) 2012, David Przybilla, Chris Umbel
 
@@ -26709,7 +22309,7 @@ module.exports = function() {
     };
 }
 
-},{"../tokenizers/aggressive_tokenizer_es":90,"../util/stopwords_es":110}],81:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_es":66,"../util/stopwords_es":86}],57:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 Farsi Stemmer by Fardin Koochaki <me@fardinak.com>
@@ -26765,7 +22365,7 @@ module.exports = function() {
     };
 }
 
-},{"../tokenizers/aggressive_tokenizer_fa":91,"../util/stopwords_fa":111}],82:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_fa":67,"../util/stopwords_fa":87}],58:[function(require,module,exports){
 /*
 Copyright (c) 2014, Ismaël Héry
 
@@ -26825,7 +22425,7 @@ module.exports = function() {
    };
 }
 
-},{"../tokenizers/aggressive_tokenizer_fr":92,"../util/stopwords_fr":112}],83:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_fr":68,"../util/stopwords_fr":88}],59:[function(require,module,exports){
 var stopwords = require('../util/stopwords_it');
 var Tokenizer = require('../tokenizers/aggressive_tokenizer_it');
 
@@ -26862,7 +22462,7 @@ module.exports = function() {
         };
     };
 }
-},{"../tokenizers/aggressive_tokenizer_it":93,"../util/stopwords_it":113}],84:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_it":69,"../util/stopwords_it":89}],60:[function(require,module,exports){
 /*
  Copyright (c) 2012, Guillaume Marty
 
@@ -27002,7 +22602,7 @@ StemmerJa.prototype.attach = function() {
 
 module.exports = StemmerJa;
 
-},{"../tokenizers/tokenizer_ja":101,"../util/stopwords_ja":114}],85:[function(require,module,exports){
+},{"../tokenizers/tokenizer_ja":77,"../util/stopwords_ja":90}],61:[function(require,module,exports){
 /*
 Copyright (c) 2014, Kristoffer Brabrand
 
@@ -27065,7 +22665,7 @@ module.exports = function() {
     };
 }
 
-},{"../tokenizers/aggressive_tokenizer_no":95,"../util/stopwords_no":115}],86:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_no":71,"../util/stopwords_no":91}],62:[function(require,module,exports){
 /*
 Copyright (c) 2013, Paweł Łaskarzewski
 
@@ -27125,7 +22725,7 @@ module.exports = function() {
     };
 }
 
-},{"../tokenizers/aggressive_tokenizer_pl":96,"../util/stopwords_pl":116}],87:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_pl":72,"../util/stopwords_pl":92}],63:[function(require,module,exports){
 /*
 Copyright (c) 2012, Polyakov Vladimir, Chris Umbel
 
@@ -27185,7 +22785,7 @@ module.exports = function() {
     };
 }
 
-},{"../tokenizers/aggressive_tokenizer_ru":98,"../util/stopwords_ru":117}],88:[function(require,module,exports){
+},{"../tokenizers/aggressive_tokenizer_ru":74,"../util/stopwords_ru":93}],64:[function(require,module,exports){
 (function (Buffer){
 /*
 Copyright (c) 2011, Rob Ellis, Chris Umbel
@@ -27383,7 +22983,7 @@ TfIdf.prototype.setTokenizer = function(t) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"../tokenizers/regexp_tokenizer":99,"../util/stopwords":109,"buffer":8,"fs":6,"underscore":136}],89:[function(require,module,exports){
+},{"../tokenizers/regexp_tokenizer":75,"../util/stopwords":85,"buffer":7,"fs":6,"underscore":112}],65:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -27421,7 +23021,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.trim(text.split(/\W+/));
 };
 
-},{"./tokenizer":100,"util":18}],90:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],66:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel,David Przybilla
 
@@ -27459,7 +23059,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.trim(text.split(/[^a-zA-Zá-úÁ-ÚñÑüÜ]+/));
 };
 
-},{"./tokenizer":100,"util":18}],91:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],67:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 Farsi Aggressive Tokenizer by Fardin Koochaki <me@fardinak.com>
@@ -27509,7 +23109,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.clearEmptyString(text.split(/\s+/));
 };
 
-},{"./tokenizer":100,"util":18}],92:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],68:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -27547,7 +23147,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.trim(text.split(/[^a-z0-9äâàéèëêïîöôùüûœç]+/i));
 };
 
-},{"./tokenizer":100,"util":18}],93:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],69:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel,David Przybilla
 
@@ -27585,7 +23185,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.trim(text.split(/\W+/));
 };
 
-},{"./tokenizer":100,"util":18}],94:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],70:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel, Martijn de Boer
 
@@ -27623,7 +23223,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.trim(text.split(/[^a-zA-Z0-9_']+/));
 };
 
-},{"./tokenizer":100,"util":18}],95:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],71:[function(require,module,exports){
 /*
 Copyright (c) 2014, Kristoffer Brabrand
 
@@ -27664,7 +23264,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.trim(text.split(/[^A-Za-z0-9_æøåÆØÅäÄöÖüÜ]+/));
 };
 
-},{"../normalizers/normalizer_no":63,"./tokenizer":100,"util":18}],96:[function(require,module,exports){
+},{"../normalizers/normalizer_no":39,"./tokenizer":76,"util":16}],72:[function(require,module,exports){
 /*
 Copyright (c) 2013, Paweł Łaskarzewski
 
@@ -27711,7 +23311,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.withoutEmpty(this.clearText(text).split(' '));
 };
 
-},{"./tokenizer":100,"util":18}],97:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],73:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel,David Przybilla
 
@@ -27753,7 +23353,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.withoutEmpty(this.trim(text.split(/[^a-zA-Zà-úÀ-Ú]/)));
 };
 
-},{"./tokenizer":100,"util":18}],98:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],74:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -27800,7 +23400,7 @@ AggressiveTokenizer.prototype.tokenize = function(text) {
     return this.withoutEmpty(this.clearText(text).split(' '));
 };
 
-},{"./tokenizer":100,"util":18}],99:[function(require,module,exports){
+},{"./tokenizer":76,"util":16}],75:[function(require,module,exports){
 /*
 Copyright (c) 2011, Rob Ellis, Chris Umbel
 
@@ -27888,7 +23488,7 @@ var WordPunctTokenizer = function(options) {
 util.inherits(WordPunctTokenizer, RegexpTokenizer);
 exports.WordPunctTokenizer = WordPunctTokenizer;
 
-},{"./tokenizer":100,"underscore":136,"util":18}],100:[function(require,module,exports){
+},{"./tokenizer":76,"underscore":112,"util":16}],76:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -27941,7 +23541,7 @@ Tokenizer.prototype.tokenize = function() {};
 
 module.exports = Tokenizer;
 
-},{}],101:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 // Original copyright:
 /*
  Copyright (c) 2008, Taku Kudo
@@ -28220,7 +23820,7 @@ TokenizerJa.prototype.tokenize = function(text) {
 
 module.exports = TokenizerJa;
 
-},{"../normalizers/normalizer_ja":62,"./tokenizer":100,"util":18}],102:[function(require,module,exports){
+},{"../normalizers/normalizer_ja":38,"./tokenizer":76,"util":16}],78:[function(require,module,exports){
 /*
 Copyright (c) 2011, Rob Ellis, Chris Umbel
 
@@ -28296,7 +23896,7 @@ TreebankWordTokenizer.prototype.tokenize = function(text) {
 
 module.exports = TreebankWordTokenizer;
 
-},{"./tokenizer":100,"underscore":136,"util":18}],103:[function(require,module,exports){
+},{"./tokenizer":76,"underscore":112,"util":16}],79:[function(require,module,exports){
 /*
  Copyright (c) 2012, Guillaume Marty
 
@@ -28880,7 +24480,7 @@ module.exports = function(str) {
   return str;
 };
 
-},{"../../util/utils":119}],104:[function(require,module,exports){
+},{"../../util/utils":95}],80:[function(require,module,exports){
 /*
 Copyright (c) 2014 Ken Koch
 
@@ -29112,7 +24712,7 @@ Trie.prototype.getSize = function() {
  **/
 module.exports = Trie;
 
-},{}],105:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 /*
  Copyright (c) 2014, Lee Wenzhu
 
@@ -29164,7 +24764,7 @@ Bag.prototype.unpack = function() {
 
 module.exports = Bag;
 
-},{}],106:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 /*
  Copyright (c) 2014, Lee Wenzhu
 
@@ -29278,7 +24878,7 @@ EdgeWeightedDigraph.prototype.toString = function() {
 
 module.exports = EdgeWeightedDigraph;
 
-},{"./bag":105,"util":18}],107:[function(require,module,exports){
+},{"./bag":81,"util":16}],83:[function(require,module,exports){
 /*
  Copyright (c) 2014, Lee Wenzhu
 
@@ -29379,7 +24979,7 @@ LongestPathTree.prototype.pathTo = function(v) {
 
 module.exports = LongestPathTree;
 
-},{"./edge_weighted_digraph":106,"./topological":118}],108:[function(require,module,exports){
+},{"./edge_weighted_digraph":82,"./topological":94}],84:[function(require,module,exports){
 /*
  Copyright (c) 2014, Lee Wenzhu
 
@@ -29481,7 +25081,7 @@ ShortestPathTree.prototype.pathTo = function(v) {
 
 module.exports = ShortestPathTree;
 
-},{"./edge_weighted_digraph":106,"./topological":118}],109:[function(require,module,exports){
+},{"./edge_weighted_digraph":82,"./topological":94}],85:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -29524,7 +25124,7 @@ var words = [
 // tell the world about the noise words.    
 exports.words = words;
 
-},{}],110:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 /*
 Copyright (c) 2011, David Przybilla, Chris Umbel
 
@@ -29562,7 +25162,7 @@ var words = [
 // tell the world about the noise words.    
 exports.words = words;
 
-},{}],111:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 Farsi Stop Words by Fardin Koochaki <me@fardinak.com>
@@ -29602,7 +25202,7 @@ var words = [
 // tell the world about the noise words.    
 exports.words = words;
 
-},{}],112:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 /*
  Copyright (c) 2014, Ismaël Héry
 
@@ -29798,7 +25398,7 @@ var words = ['être', 'avoir', 'faire',
 
 exports.words = words;
 
-},{}],113:[function(require,module,exports){
+},{}],89:[function(require,module,exports){
 /*
 Copyright (c) 2011, David Przybilla, Chris Umbel
 
@@ -29852,7 +25452,7 @@ var words = [
 // tell the world about the noise words.    
 exports.words = words;
 
-},{}],114:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 // Original copyright:
 /*
  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -29913,7 +25513,7 @@ var words = ['の', 'に', 'は', 'を', 'た', 'が', 'で', 'て', 'と', 'し
 // tell the world about the noise words.
 module.exports = words;
 
-},{}],115:[function(require,module,exports){
+},{}],91:[function(require,module,exports){
 /*
 Copyright (c) 2014, Kristoffer Brabrand
 
@@ -29956,7 +25556,7 @@ var words = [
 
 // tell the world about the noise words.
 exports.words = words;
-},{}],116:[function(require,module,exports){
+},{}],92:[function(require,module,exports){
 /*
 Copyright (c) 2013, Paweł Łaskarzewski
 
@@ -30020,7 +25620,7 @@ var words = [
 // tell the world about the noise words.
 exports.words = words;
 
-},{}],117:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 /*
 Copyright (c) 2011, Polyakov Vladimir, Chris Umbel
 
@@ -30063,7 +25663,7 @@ var words = [
 // tell the world about the noise words.    
 exports.words = words;
 
-},{}],118:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
 /*
  Copyright (c) 2014, Lee Wenzhu
 
@@ -30163,7 +25763,7 @@ function uniqueVertexs(edges) {
 
 module.exports = Topological;
 
-},{}],119:[function(require,module,exports){
+},{}],95:[function(require,module,exports){
 /*
  Copyright (c) 2012, Guillaume Marty
 
@@ -30284,7 +25884,7 @@ exports.replacer = replacer;
 exports.flip = flip;
 exports.merge = merge;
 
-},{}],120:[function(require,module,exports){
+},{}],96:[function(require,module,exports){
 (function (Buffer){
 /*
 Copyright (c) 2011, Chris Umbel
@@ -30374,7 +25974,7 @@ DataFile.prototype.get = get;
 module.exports = DataFile;
 
 }).call(this,require("buffer").Buffer)
-},{"./wordnet_file":123,"buffer":8,"fs":6,"util":18}],121:[function(require,module,exports){
+},{"./wordnet_file":99,"buffer":7,"fs":6,"util":16}],97:[function(require,module,exports){
 (function (Buffer){
 /*
 Copyright (c) 2011, Chris Umbel
@@ -30518,7 +26118,7 @@ IndexFile.prototype._findAt = findAt;
 module.exports = IndexFile;
 
 }).call(this,require("buffer").Buffer)
-},{"./wordnet_file":123,"buffer":8,"fs":6,"util":18}],122:[function(require,module,exports){
+},{"./wordnet_file":99,"buffer":7,"fs":6,"util":16}],98:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -30689,7 +26289,7 @@ function WordNet(dataDir) {
 
 module.exports = WordNet;
 
-},{"./data_file":120,"./index_file":121,"WNdb":5}],123:[function(require,module,exports){
+},{"./data_file":96,"./index_file":97,"WNdb":5}],99:[function(require,module,exports){
 (function (Buffer){
 /*
 Copyright (c) 2011, Chris Umbel
@@ -30762,7 +26362,7 @@ WordNetFile.appendLineChar = appendLineChar;
 module.exports = WordNetFile;
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":8,"fs":6,"path":15,"util":18}],124:[function(require,module,exports){
+},{"buffer":7,"fs":6,"path":13,"util":16}],100:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -30895,7 +26495,7 @@ BayesClassifier.prototype.probabilityOfClass = probabilityOfClass;
 BayesClassifier.restore = restore;
 
 module.exports = BayesClassifier;
-},{"./classifier":125,"util":18}],125:[function(require,module,exports){
+},{"./classifier":101,"util":16}],101:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -30951,7 +26551,7 @@ Classifier.restore = restore;
 
 module.exports = Classifier;
 
-},{}],126:[function(require,module,exports){
+},{}],102:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -31145,7 +26745,7 @@ LogisticRegressionClassifier.restore = restore;
 
 module.exports = LogisticRegressionClassifier;
 
-},{"./classifier":125,"sylvester":129,"util":18}],127:[function(require,module,exports){
+},{"./classifier":101,"sylvester":105,"util":16}],103:[function(require,module,exports){
 /*
 Copyright (c) 2011, Chris Umbel
 
@@ -31265,13 +26865,13 @@ KMeans.prototype.cluster = cluster;
 
 module.exports = KMeans;
 
-},{"sylvester":129}],128:[function(require,module,exports){
+},{"sylvester":105}],104:[function(require,module,exports){
 
 exports.BayesClassifier = require('./classifier/bayes_classifier');
 exports.LogisticRegressionClassifier = require('./classifier/logistic_regression_classifier');
 exports.KMeans = require('./clusterer/kmeans');
 
-},{"./classifier/bayes_classifier":124,"./classifier/logistic_regression_classifier":126,"./clusterer/kmeans":127}],129:[function(require,module,exports){
+},{"./classifier/bayes_classifier":100,"./classifier/logistic_regression_classifier":102,"./clusterer/kmeans":103}],105:[function(require,module,exports){
 (function (global){
 // Copyright (c) 2011, Chris Umbel
 
@@ -31287,7 +26887,7 @@ exports.Line.Segment = require('./line.segment');
 exports.Sylvester = require('./sylvester');
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./line":130,"./line.segment":131,"./matrix":132,"./plane":133,"./sylvester":134,"./vector":135}],130:[function(require,module,exports){
+},{"./line":106,"./line.segment":107,"./matrix":108,"./plane":109,"./sylvester":110,"./vector":111}],106:[function(require,module,exports){
 // Copyright (c) 2011, Chris Umbel, James Coglan
 var Vector = require('./vector');
 var Matrix = require('./matrix');
@@ -31520,7 +27120,7 @@ Line.Z = Line.create(Vector.Zero(3), Vector.k);
 
 module.exports = Line;
 
-},{"./matrix":132,"./plane":133,"./sylvester":134,"./vector":135}],131:[function(require,module,exports){
+},{"./matrix":108,"./plane":109,"./sylvester":110,"./vector":111}],107:[function(require,module,exports){
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // Line.Segment class - depends on Line and its dependencies.
 
@@ -31648,7 +27248,7 @@ Line.Segment.create = function(v1, v2) {
 
 module.exports = Line.Segment;
 
-},{"./line":130,"./vector":135}],132:[function(require,module,exports){
+},{"./line":106,"./vector":111}],108:[function(require,module,exports){
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // Matrix class - depends on Vector.
 
@@ -32686,7 +28286,7 @@ Matrix.Ones = function(n, m) {
 
 module.exports = Matrix;
 
-},{"./sylvester":134,"./vector":135,"fs":6,"lapack":21}],133:[function(require,module,exports){
+},{"./sylvester":110,"./vector":111,"fs":6,"lapack":6}],109:[function(require,module,exports){
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // Plane class - depends on Vector. Some methods require Matrix and Line.
 var Vector = require('./vector');
@@ -32962,7 +28562,7 @@ Plane.fromPoints = function(points) {
 
 module.exports = Plane;
 
-},{"./line":130,"./matrix":132,"./sylvester":134,"./vector":135}],134:[function(require,module,exports){
+},{"./line":106,"./matrix":108,"./sylvester":110,"./vector":111}],110:[function(require,module,exports){
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // This file is required in order for any other classes to work. Some Vector methods work with the
 // other Sylvester classes and are useless unless they are included. Other classes such as Line and
@@ -32979,7 +28579,7 @@ var Sylvester = {
 
 module.exports = Sylvester;
 
-},{}],135:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // This file is required in order for any other classes to work. Some Vector methods work with the
 // other Sylvester classes and are useless unless they are included. Other classes such as Line and
@@ -33419,7 +29019,7 @@ Vector.log = function(v) {
 
 module.exports = Vector;
 
-},{"./matrix":132,"./sylvester":134}],136:[function(require,module,exports){
+},{"./matrix":108,"./sylvester":110}],112:[function(require,module,exports){
 //     Underscore.js 1.8.3
 //     http://underscorejs.org
 //     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -34969,7 +30569,7 @@ module.exports = Vector;
   }
 }.call(this));
 
-},{}],137:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 var vovels = 'eyuioa';
 var consonants = 'qwrtpasdfghjklmnbvcxz';
 
@@ -34981,7 +30581,7 @@ module.exports.is_consonant = function(sym) {
 	return consonants.indexOf(sym.toLowerCase()) !== -1;
 };
 
-},{}],138:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 var PresentVerbInflector = require('natural').PresentVerbInflector,
     find_irregular_verb = require('./verbs'),
     symbols = require('symbols');
@@ -35086,7 +30686,7 @@ var tensify = function(verb) {
 
 module.exports = tensify;
 
-},{"./verbs":139,"natural":51,"symbols":137}],139:[function(require,module,exports){
+},{"./verbs":115,"natural":27,"symbols":113}],115:[function(require,module,exports){
 // Last element - past participle
 // Last - 1 element - past simple
 // All elements before are present

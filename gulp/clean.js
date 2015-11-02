@@ -5,7 +5,7 @@ gulp.task('clean:coverage', function(cb) {
   rimraf('./coverage', cb);
 });
 
-gulp.task('clean:dist', function() {
+gulp.task('clean:dist', function(cb) {
   rimraf('./dist', cb);
 });
 

@@ -16,6 +16,16 @@ describe 'whimsy required as a module', ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
 
+    context 'with a filter', ->
+      context 'as a string', ->
+        When -> @generated = @subject.noun filters: [
+          name: 'capitalize'
+        ,
+          name: 'startsWith'
+          params: ['a']
+        ]
+        Then -> @generated.should.match(/^A/)
+
   describe '.verb', ->
     context 'no options', ->
       Then -> @subject.verb().should.be.oneOf @words.verb

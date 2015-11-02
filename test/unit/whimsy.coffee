@@ -3,8 +3,13 @@ _ = require 'lodash'
 
 describe 'whimsy', ->
   Given -> @filters = require '../../lib/filters',
-  Given -> @lists = require('../../lib/words').get()
-  Given -> @subject = require '../../lib/whimsy'
+  Given -> @lists =
+    banana: ['foo', 'bar']
+    fruits:
+      apple: ['baz', 'quux']
+  Given -> @subject = proxyquire '../../lib/whimsy',
+    './words':
+      get: => @lists
 
   describe 'interpolation', ->
     afterEach -> @subject.interpolate.restore()
@@ -29,14 +34,17 @@ describe 'whimsy', ->
     afterEach -> @subject.makeFilters.restore()
     afterEach -> @subject.generate.restore()
     afterEach -> @subject.applyFilters.restore()
+    afterEach -> @subject.getFilterSets.restore()
     Given -> sinon.stub @subject, 'makeFilters'
     Given -> sinon.stub @subject, 'generate'
     Given -> sinon.stub @subject, 'applyFilters'
-    Given -> @filters.preFilters = ['inspect', 'peel']
-    Given -> @filters.postFilters = ['eat', 'throw away']
+    Given -> sinon.stub @subject, 'getFilterSets'
 
     context 'no filters', ->
       Given -> @subject.makeFilters.withArgs(match: 'banana').returns []
+      Given -> @subject.getFilterSets.withArgs([]).returns
+        preFilters: []
+        postFilters: []
       Given -> @subject.generate.withArgs('banana', []).returns 'yellow'
       Given -> @subject.applyFilters.withArgs('yellow', []).returns 'done'
       Then -> @subject.interpolate('{{ banana }}', 'banana').should.eql 'done'
@@ -47,9 +55,31 @@ describe 'whimsy', ->
       ,
         name: 'eat'
       ]
+      Given -> @subject.getFilterSets.withArgs([{ name: 'peel' },{ name: 'eat' }]).returns
+        preFilters: [ name: 'peel' ]
+        postFilters: [ name: 'eat' ]
       Given -> @subject.generate.withArgs('banana | peel | eat', [name: 'peel']).returns 'yellow'
       Given -> @subject.applyFilters.withArgs('yellow', [name: 'eat']).returns 'done'
       Then -> @subject.interpolate('{{ banana | pluralize }}', 'banana | peel | eat ').should.eql 'done'
+
+  describe '.getFilterSets', ->
+    Given -> @filters.preFilters = ['inspect', 'peel']
+    Given -> @filters.postFilters = ['eat', 'throw away']
+    Then -> @subject.getFilterSets([
+      name: 'eat',
+    ,
+      name: 'inspect'
+    ,
+      name: 'throw away'
+    ]).should.eql
+      preFilters: [
+        name: 'inspect'
+      ]
+      postFilters: [
+        name: 'eat'
+      ,
+        name:'throw away'
+      ]
 
   describe '.parse', ->
     afterEach -> delete @filters.foo
@@ -199,95 +229,56 @@ describe 'whimsy', ->
 
   describe 'parts of speech', ->
     afterEach -> @subject.generate.restore()
-    Given -> sinon.stub(@subject, 'generate')
+    afterEach -> @subject.getFilterSets.restore()
+    afterEach -> @subject.applyFilters.restore()
+    Given -> sinon.stub @subject, 'generate'
+    Given -> sinon.stub @subject, 'getFilterSets'
+    Given -> sinon.stub @subject, 'applyFilters'
 
-    describe '.noun', ->
+    context 'top level object', ->
+      Given -> @subject.applyFilters.returnsArg 0
+
       context 'with no options', ->
-        Given -> @subject.generate.withArgs('noun', {}).returns 'banana'
-        Then -> @subject.noun().should.eql 'banana'
+        Given -> @subject.generate.withArgs('banana', {}).returns 'banana'
+        Then -> @subject.banana().should.eql 'banana'
 
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('noun', { count: 2 }).returns ['banana', 'orange']
-        Then -> @subject.noun({ count: 2 }).should.eql ['banana', 'orange']
+      context 'with options', ->
+        Given -> @subject.generate.withArgs('banana', foo: 'bar').returns 'banana'
+        Then -> @subject.banana(foo: 'bar').should.eql 'banana'
 
-    describe '.verb', ->
+    context 'sub-level object', ->
+      Given -> @subject.applyFilters.returnsArg 0
+
       context 'with no options', ->
-        Given -> @subject.generate.withArgs('verb', {}).returns 'banana'
-        Then -> @subject.verb().should.eql 'banana'
+        context 'with a type', ->
+          Given -> @subject.generate.withArgs('fruits.apple', {}).returns 'banana'
+          Then -> @subject.fruits('apple').should.eql 'banana'
+          
+        context 'with no type', ->
+          Given -> @subject.generate.withArgs('fruits', {}).returns 'banana'
+          Then -> @subject.fruits().should.eql 'banana'
 
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('verb', { count: 2 }).returns 'banana'
-        Then -> @subject.verb({ count: 2 }).should.eql 'banana'
+      context 'with options', ->
+        context 'with a type', ->
+          Given -> @subject.generate.withArgs('fruits.apple', foo: 'bar').returns 'banana'
+          Then -> @subject.fruits('apple', foo: 'bar').should.eql 'banana'
+          
+        context 'with no type', ->
+          Given -> @subject.generate.withArgs('fruits', foo: 'bar').returns 'banana'
+          Then -> @subject.fruits(foo: 'bar').should.eql 'banana'
 
-    describe '.adjective', ->
-      context 'with no options', ->
-        Given -> @subject.generate.withArgs('adjective', {}).returns 'banana'
-        Then -> @subject.adjective().should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('adjective', { count: 2 }).returns 'banana'
-        Then -> @subject.adjective({ count: 2 }).should.eql 'banana'
-
-    describe '.adverb', ->
-      context 'with no options', ->
-        Given -> @subject.generate.withArgs('adverb', {}).returns 'banana'
-        Then -> @subject.adverb().should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('adverb', { count: 2 }).returns 'banana'
-        Then -> @subject.adverb({ count: 2 }).should.eql 'banana'
-
-    describe '.pronoun', ->
-      context 'with no options', ->
-        context 'top level', ->
-          Given -> @subject.generate.withArgs('pronoun', {}).returns 'banana'
-          Then -> @subject.pronoun().should.eql 'banana'
-
-        context 'nested', ->
-          Given -> @subject.generate.withArgs('pronoun.banana', {}).returns 'banana'
-          Then -> @subject.pronoun('banana').should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('pronoun.banana', { count: 2 }).returns 'banana'
-        Then -> @subject.pronoun('banana', { count: 2 }).should.eql 'banana'
-
-    describe '.preposition', ->
-      context 'with no options', ->
-        Given -> @subject.generate.withArgs('preposition', {}).returns 'banana'
-        Then -> @subject.preposition().should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('preposition', { count: 2 }).returns 'banana'
-        Then -> @subject.preposition({ count: 2 }).should.eql 'banana'
-        
-    describe '.conjunction', ->
-      context 'with no options', ->
-        context 'top level', ->
-          Given -> @subject.generate.withArgs('conjunction', {}).returns 'banana'
-          Then -> @subject.conjunction().should.eql 'banana'
-
-        context 'nested', ->
-          Given -> @subject.generate.withArgs('conjunction.banana', {}).returns 'banana'
-          Then -> @subject.conjunction('banana').should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('conjunction', { count: 2 }).returns 'banana'
-        Then -> @subject.conjunction({ count: 2 }).should.eql 'banana'
-
-    describe '.interjection', ->
-      context 'with no options', ->
-        Given -> @subject.generate.withArgs('interjection', {}).returns 'banana'
-        Then -> @subject.interjection().should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('interjection', { count: 2 }).returns 'banana'
-        Then -> @subject.interjection({ count: 2 }).should.eql 'banana'
-
-    describe '.article', ->
-      context 'with no options', ->
-        Given -> @subject.generate.withArgs('article', {}).returns 'banana'
-        Then -> @subject.article().should.eql 'banana'
-
-      context 'with a count', ->
-        Given -> @subject.generate.withArgs('article', { count: 2 }).returns 'banana'
-        Then -> @subject.article({ count: 2 }).should.eql 'banana'
+    context 'with filters', ->
+      Given -> @subject.getFilterSets.withArgs([name: 'foo']).returns
+        preFilters: [name: 'foo']
+        postFilters: [name: 'bar']
+      Given -> @subject.generate.withArgs('banana',
+        filters: [
+          name: 'foo'
+        ]
+      , [name: 'foo']).returns 'banana'
+      Given -> @subject.applyFilters.withArgs('banana', [name: 'bar']).returns 'peeled banana'
+      Then -> @subject.banana(
+        filters: [
+          name: 'foo'
+        ]
+      ).should.eql 'peeled banana'

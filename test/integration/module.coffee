@@ -3,6 +3,7 @@ _ = require 'lodash'
 words = require '../../lib/words'
 
 describe 'whimsy required as a module', ->
+  afterEach -> @subject.generated = []
   Given -> @words = words.get()
   Given -> @subject = require '../../lib/whimsy'
 
@@ -17,14 +18,13 @@ describe 'whimsy required as a module', ->
         @generated.length.should.eql 2
 
     context 'with a filter', ->
-      context 'as a string', ->
-        When -> @generated = @subject.noun filters: [
-          name: 'capitalize'
-        ,
-          name: 'startsWith'
-          params: ['a']
-        ]
-        Then -> @generated.should.match(/^A/)
+      When -> @generated = @subject.noun filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['a']
+      ]
+      Then -> @generated.should.match(/^A/)
 
   describe '.verb', ->
     context 'no options', ->
@@ -35,6 +35,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.verb filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['s']
+      ]
+      Then -> @generated.should.match(/^S/)
     
   describe '.adjective', ->
     context 'no options', ->
@@ -45,6 +54,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.adjective filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['s']
+      ]
+      Then -> @generated.should.match(/^S/)
      
   describe '.adverb', ->
     context 'no options', ->
@@ -55,6 +73,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.adverb filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['q']
+      ]
+      Then -> @generated.should.match(/^Q/)
     
   describe '.pronoun', ->
     context 'top level', ->
@@ -68,6 +95,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.pronoun 'reflexive', filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['m']
+      ]
+      Then -> @generated.should.eql 'Myself'
     
   describe '.preposition', ->
     context 'no options', ->
@@ -78,6 +114,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.preposition filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['a']
+      ]
+      Then -> @generated.should.match /^A/
     
   describe '.conjunction', ->
     context 'top level', ->
@@ -91,6 +136,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.conjunction filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['a']
+      ]
+      Then -> @generated.should.match /^A/
     
   describe '.interjection', ->
     context 'no options', ->
@@ -101,6 +155,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.interjection filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['a']
+      ]
+      Then -> @generated.should.match /^A/
     
   describe '.article', ->
     context 'no options', ->
@@ -111,6 +174,15 @@ describe 'whimsy required as a module', ->
       Then ->
         @generated.should.be.an.instanceof(Array)
         @generated.length.should.eql 2
+
+    context 'with a filter', ->
+      When -> @generated = @subject.article filters: [
+        name: 'capitalize'
+      ,
+        name: 'startsWith'
+        params: ['a']
+      ]
+      Then -> @generated.should.match /^A/
     
   describe 'called as a function', ->
     Given -> @subject.generated = []

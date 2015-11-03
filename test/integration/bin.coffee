@@ -73,6 +73,10 @@ describe 'whimsy as a command line binary', ->
         When (done) -> @capture(['noun', '-c', 2], done)
         Then -> @output.split(reg).length.should.eql 2
 
+      context 'with filters', ->
+        When (done) -> @capture(['noun', '-f', 'capitalize', '--filter', 'startsWith("s")'], done)
+        Then -> @output.should.match /^S/
+
     describe '.verb', ->
       context 'no options', ->
         When (done) -> @capture(['verb'], done)
@@ -82,6 +86,10 @@ describe 'whimsy as a command line binary', ->
       context 'with a count', ->
         When (done) -> @capture(['verb', '-c', 2], done)
         Then -> @output.split(reg).length.should.eql 2
+
+      context 'with filters', ->
+        When (done) -> @capture(['verb', '-f', 'capitalize', '--filter', 'startsWith("s")'], done)
+        Then -> @output.should.match /^S/
 
     describe '.adjective', ->
       context 'no options', ->
@@ -93,6 +101,10 @@ describe 'whimsy as a command line binary', ->
         When (done) -> @capture(['adjective', '--count', 2], done)
         Then -> @output.split(reg).length.should.eql 2
 
+      context 'with filters', ->
+        When (done) -> @capture(['adjective', '-f', 'capitalize', '--filter', 'startsWith("s")'], done)
+        Then -> @output.should.match /^S/
+
     describe '.adverb', ->
       context 'no options', ->
         When (done) -> @capture(['adverb'], done)
@@ -102,6 +114,10 @@ describe 'whimsy as a command line binary', ->
       context 'with a count', ->
         When (done) -> @capture(['adverb', '-c', 2], done)
         Then -> @output.split(reg).length.should.eql 2
+
+      context 'with filters', ->
+        When (done) -> @capture(['adverb', '-f', 'capitalize', '--filter', 'startsWith("q")'], done)
+        Then -> @output.should.match /^Q/
 
     describe '.pronoun', ->
       context 'with no subtype', ->
@@ -124,6 +140,10 @@ describe 'whimsy as a command line binary', ->
           When (done) -> @capture(['pronoun', 'personal', '-c', 2], done)
           Then -> @output.split(reg).length.should.eql 2
 
+      context 'with filters', ->
+        When (done) -> @capture(['pronoun', 'reflexive', '-f', 'capitalize', '--filter', 'startsWith("m")'], done)
+        Then -> @output.should.eql 'Myself'
+
     describe '.preposition', ->
       context 'no options', ->
         When (done) -> @capture(['preposition'], done)
@@ -133,6 +153,10 @@ describe 'whimsy as a command line binary', ->
       context 'with a count', ->
         When (done) -> @capture(['preposition', '-c', 2], done)
         Then -> @output.split(reg).length.should.eql 2
+
+      context 'with filters', ->
+        When (done) -> @capture(['preposition', '-f', 'capitalize', '--filter', 'startsWith("s")'], done)
+        Then -> @output.should.match /^S/
 
     describe '.conjunction', ->
       context 'with no subtype', ->
@@ -155,6 +179,10 @@ describe 'whimsy as a command line binary', ->
           When (done) -> @capture(['conjunction', 'correlative', '-c', 2], done)
           Then -> @output.split(reg).length.should.eql 2
 
+      context 'with filters', ->
+        When (done) -> @capture(['conjunction', '-f', 'capitalize', '--filter', 'startsWith("s")'], done)
+        Then -> @output.should.match /^S/
+
     describe '.interjection', ->
       context 'no options', ->
         When (done) -> @capture(['interjection'], done)
@@ -165,6 +193,10 @@ describe 'whimsy as a command line binary', ->
         When (done) -> @capture(['interjection', '-c', 2], done)
         Then -> @output.split(reg).length.should.eql 2
 
+      context 'with filters', ->
+        When (done) -> @capture(['interjection', '-f', 'capitalize', '--filter', 'startsWith("s")'], done)
+        Then -> @output.should.match /^S/
+
     describe '.article', ->
       context 'no options', ->
         When (done) -> @capture(['article'], done)
@@ -174,6 +206,10 @@ describe 'whimsy as a command line binary', ->
       context 'with a count', ->
         When (done) -> @capture(['article', '-c', 2], done)
         Then -> @output.split(reg).length.should.eql 2
+
+      context 'with filters', ->
+        When (done) -> @capture(['article', '-f', 'capitalize', '--filter', 'startsWith("a")'], done)
+        Then -> @output.should.match /^A/
 
     describe 'with no specific command', ->
       context 'with interpolation', ->

@@ -85,14 +85,23 @@ describe 'bin/whimsy', ->
       _.pluck(@subject.commands, '_alias')[1].should.eql 'rm'
       _(@subject.commands).pluck('options').flatten().pluck('flags').value().should.eql [
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]',
+        '-f, --filter [filter]',
         '-c, --count [count]'
+        '-f, --filter [filter]',
       ]
 
   describe '.add', ->

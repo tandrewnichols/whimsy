@@ -11,8 +11,11 @@ describe 'cli', ->
       baz: ['quux']
   Given -> @words =
     get: => @lists
+  Given -> @whimsy =
+    parse: sinon.stub()
   Given -> @subject = proxyquire '../../lib/cli',
-    '../lib/words': @words
+    './words': @words
+    './whimsy': @whimsy
   Given -> @fs = require 'fs'
   Given -> sinon.stub @fs, 'writeFile'
   Given -> @path = path.resolve __dirname, '../../lib/parts-of-speech.json'
@@ -81,15 +84,28 @@ describe 'cli', ->
     context 'with arguments', ->
       When -> @func = @subject.writeResult @foo
       And -> @func 'blah', 7, { options: true }
-      Then -> @foo.should.have.been.calledWith 'blah', 7
+      Then -> @foo.should.have.been.calledWith 'blah', 7, { count: undefined, filters: undefined }
 
     context 'with options', ->
       Given -> @foo.returns ['bar', 'baz']
       When -> @func = @subject.writeResult @foo
       And -> @func 'blah', 7, { count: 2 }
       Then ->
-        @foo.should.have.been.calledWith 'blah', 7, { count: 2 }
+        @foo.should.have.been.calledWith 'blah', 7, { count: 2, filters: undefined }
         process.stdout.write.should.have.been.calledWith 'bar, baz'
+
+    context 'with filters', ->
+      When -> @func = @subject.writeResult @foo
+      And -> @func 'blah', { filter: [ name: 'banana' ] }
+      Then -> @foo.should.have.been.calledWith 'blah', { count: undefined, filters: [ name: 'banana' ] }
+
+  describe '.collectFilters', ->
+    Given -> @whimsy.parse.withArgs('foo("bar")').returns name: 'bar'
+    Then -> @subject.collectFilters('foo("bar")', [name: 'quux']).should.eql [
+      name: 'quux'
+    ,
+      name: 'bar'
+    ]
 
   describe '.logBlock', ->
     afterEach -> console.log.restore()

@@ -28,6 +28,7 @@ _.each(lists, function(val, key) {
   program.command(command)
     .description('Generate ' + a(key))
     .option('-c, --count [count]', 'Generate multiple instances', Number)
+    .option('-f, --filter [filter]', 'Apply a transformation to the word', cli.collectFilters)
     .action(cli.writeResult(whimsy[key]));
 });
 

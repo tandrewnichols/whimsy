@@ -49,6 +49,7 @@
     "file-manifest": "^1.0.3",
     "gulp": "^3.9.0",
     "gulp-codeclimate-reporter": "^1.0.0",
+    "gulp-debug": "^2.1.2",
     "gulp-istanbul": "^0.10.2",
     "gulp-jshint": "^1.11.2",
     "gulp-mocha": "^2.1.3",

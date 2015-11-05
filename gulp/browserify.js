@@ -9,7 +9,7 @@ gulp.task('browserify', function() {
     standalone: 'whimsy' 
   });
   b.ignore('lapack');
-  b.bundle()
+  return b.bundle()
     .pipe(source('whimsy.js'))
     .pipe(buffer())
     .pipe(gulp.dest('dist'));

@@ -101,11 +101,18 @@ describe 'cli', ->
 
   describe '.collectFilters', ->
     Given -> @whimsy.parse.withArgs('foo("bar")').returns name: 'bar'
-    Then -> @subject.collectFilters('foo("bar")', [name: 'quux']).should.eql [
-      name: 'quux'
-    ,
-      name: 'bar'
-    ]
+
+    context 'memo is already an array', ->
+      Then -> @subject.collectFilters('foo("bar")', [name: 'quux']).should.eql [
+        name: 'quux'
+      ,
+        name: 'bar'
+      ]
+
+    context 'memo is undefined', ->
+      Then -> @subject.collectFilters('foo("bar")').should.eql [
+        name: 'bar'
+      ]
 
   describe '.logBlock', ->
     afterEach -> console.log.restore()

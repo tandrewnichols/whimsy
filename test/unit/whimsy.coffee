@@ -147,10 +147,17 @@ describe 'whimsy', ->
 
   describe '.invokeFilter', ->
     Given -> @filters.peel = sinon.stub()
-    When -> @subject.invokeFilter 'current value',
-      name: 'peel'
-      params: [1, 2]
-    Then -> @filters.peel.should.have.been.calledWith( 1, 2, 'current value')
+
+    context 'with params', ->
+      When -> @subject.invokeFilter 'current value',
+        name: 'peel'
+        params: [1, 2]
+      Then -> @filters.peel.should.have.been.calledWith(1, 2, 'current value')
+
+    context 'with no params', ->
+      When -> @subject.invokeFilter 'current value',
+        name: 'peel'
+      Then -> @filters.peel.should.have.been.calledWith()
 
   describe '.concat', ->
     context 'type exists', ->

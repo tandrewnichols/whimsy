@@ -13,16 +13,16 @@ describe 'cli', ->
     get: => @lists
   Given -> @whimsy =
     parse: sinon.stub()
+  Given -> @block = sinon.stub()
   Given -> @subject = proxyquire '../../lib/cli',
     './words': @words
     './whimsy': @whimsy
+    'log-block': @block
   Given -> @fs = require 'fs'
   Given -> sinon.stub @fs, 'writeFile'
   Given -> @path = path.resolve __dirname, '../../lib/parts-of-speech.json'
 
   describe '.add', ->
-    afterEach -> @subject.logBlock.restore()
-    Given -> sinon.stub @subject, 'logBlock'
     Given -> @words.stringify = sinon.stub()
     Given -> @words.stringify.withArgs(@lists).returns 'many bananas'
     Given -> @fs.writeFile.withArgs(@path, 'many bananas', { encoding: 'utf8' }, sinon.match.func).callsArgWith 3, null, 'blah'
@@ -32,7 +32,7 @@ describe 'cli', ->
       When -> @subject.add 'banana', ['bar'], {}
       Then ->
         @lists.banana.should.eql ['foo', 'bar']
-        @subject.logBlock.should.have.been.calledWith chalk.green(1), 'banana', 'added'
+        @block.should.have.been.calledWith chalk.green(1), 'banana', 'added'
 
     context 'nested object', ->
       Given -> @lists.fruit =
@@ -40,14 +40,14 @@ describe 'cli', ->
       When -> @subject.add 'fruit.banana', ['bar'], {}
       Then ->
         @lists.fruit.banana.should.eql ['foo', 'bar']
-        @subject.logBlock.should.have.been.calledWith chalk.green(1), 'fruit.banana', 'added'
+        @block.should.have.been.calledWith chalk.green(1), 'fruit', 'added'
 
     context 'multiple words', ->
       Given -> @lists.banana = ['foo']
       When -> @subject.add 'banana', ['bar', 'baz', 'quux'], {}
       Then ->
         @lists.banana.should.eql ['foo', 'bar', 'baz', 'quux']
-        @subject.logBlock.should.have.been.calledWith chalk.green(3), 'banana', 'added'
+        @block.should.have.been.calledWith chalk.green(3), 'bananas', 'added'
 
     context 'duplicate words', ->
       Given -> @lists.banana = ['foo']
@@ -55,10 +55,9 @@ describe 'cli', ->
       Then ->
         @lists.banana.should.eql ['foo']
         @fs.writeFile.should.not.have.been.called()
+        @block.should.have.been.calledWith chalk.red(0), 'bananas', 'added'
 
   describe '.remove', ->
-    afterEach -> @subject.logBlock.restore()
-    Given -> sinon.stub @subject, 'logBlock'
     Given -> @words.stringify = sinon.stub()
     Given -> @words.stringify.withArgs(@lists).returns 'many bananas'
     Given -> @fs.writeFile.withArgs(@path, 'many bananas', { encoding: 'utf8' }, sinon.match.func).callsArgWith 3, null, 'blah'
@@ -68,7 +67,7 @@ describe 'cli', ->
       When -> @subject.remove 'banana', ['foo'], {}
       Then ->
         @lists.banana.should.eql []
-        @subject.logBlock.should.have.been.calledWith chalk.green(1), 'banana', 'removed'
+        @block.should.have.been.calledWith chalk.green(1), 'banana', 'removed'
 
   describe '.writeResult', ->
     afterEach -> process.stdout.write.restore()
@@ -113,11 +112,3 @@ describe 'cli', ->
       Then -> @subject.collectFilters('foo("bar")').should.eql [
         name: 'bar'
       ]
-
-  describe '.logBlock', ->
-    afterEach -> console.log.restore()
-    Given -> sinon.stub console, 'log'
-    When -> @subject.logBlock '2', 'banana', 'eaten'
-    Then ->
-      console.log.callCount.should.eql 3
-      console.log.getCall(1).args.should.eql ['  ', '2', 'bananas', 'eaten']

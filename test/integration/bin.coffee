@@ -49,7 +49,7 @@ describe 'whimsy as a command line binary', ->
     Given -> @capture = (args, done) =>
       child = @spawn(whimsy, args)
       child.stdout.on 'data', (data) =>
-        @output += data.toString()
+        @output += data.toString().replace('\n', '')
       child.on 'close', -> done()
     Given -> @reduce = (type, subtype) ->
       list = require('../../lib/parts-of-speech')[type]
@@ -61,7 +61,6 @@ describe 'whimsy as a command line binary', ->
         return _.reduce list, (memo, val, key) ->
           return memo.concat val.split(reg)
         , []
-
 
     describe '.noun', ->
       context 'no options', ->

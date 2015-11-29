@@ -70,15 +70,15 @@ describe 'cli', ->
         @block.should.have.been.calledWith chalk.green(1), 'banana', 'removed'
 
   describe '.writeResult', ->
-    afterEach -> process.stdout.write.restore()
-    Given -> sinon.stub process.stdout, 'write'
+    afterEach -> console.log.restore()
+    Given -> sinon.stub console, 'log'
     Given -> @foo = sinon.stub()
     Given -> @foo.returns 'bar'
 
     context 'with no arguments', ->
       When -> @func = @subject.writeResult @foo
       And -> @func()
-      Then -> process.stdout.write.should.have.been.calledWith 'bar'
+      Then -> console.log.should.have.been.calledWith 'bar'
 
     context 'with arguments', ->
       When -> @func = @subject.writeResult @foo
@@ -91,7 +91,7 @@ describe 'cli', ->
       And -> @func 'blah', 7, { count: 2 }
       Then ->
         @foo.should.have.been.calledWith 'blah', 7, { count: 2, filters: undefined }
-        process.stdout.write.should.have.been.calledWith 'bar, baz'
+        console.log.should.have.been.calledWith 'bar, baz'
 
     context 'with filters', ->
       When -> @func = @subject.writeResult @foo

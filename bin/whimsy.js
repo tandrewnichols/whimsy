@@ -35,7 +35,7 @@ _.each(lists, function(val, key) {
 // Only add this command if the arguments to the script don't match any
 // of the commands above so that this command doesn't overwrite the
 // more specific "count" options above.
-if (process.argv[1].split('/').pop() === 'whimsy.js' && _.pluck(program.commands, '_name').indexOf(process.argv[2]) === -1) {
+if (process.argv[1].split('/').pop().indexOf('whimsy') > -1 && _.pluck(program.commands, '_name').indexOf(process.argv[2]) === -1) {
   program
     .option('-c, --count [count]', 'Generate multiple instances', Number)
     .command('*')

@@ -10,6 +10,8 @@ Generate parts of speech to add a touch of whimsy.
 
 ## Summary
 
+Whimsy is a little bit like a programmatic madlib. It will generate random words based on the part of speech you give it. But it does a lot more, including filtering of the list of words (e.g. only words starting with "s" or only _reflexive_ pronouns), transforming the word selected (e.g. capitalizing or conjugating), and saving words to apply them again later.
+
 ## Usage
 
 ### Node
@@ -19,4 +21,4 @@ Generate parts of speech to add a touch of whimsy.
 
 ## Contributing
 
-Please see [the contribution guidelines](contributing.md).
+Please see [the contribution guidelines](CONTRIBUTING.md).

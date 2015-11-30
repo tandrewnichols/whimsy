@@ -60,7 +60,39 @@ You can also combine filters and transformers (as many as you want and in any or
 whimsy('{{ noun | startsWith("a") | capitalize | endsWith("e") }}');
 ```
 
-### Node
+The available filters are:
+
+* `startsWith(letter)` - Include only words beginning with `letter`.
+* `endsWith(letter)` - Include only words ending with `letter`.
+* `contains(substring)` - Include only words containing `substring`.
+* `matching(regex)` - Include only words matching `regex`.
+* `greaterThan(number)` - Include only words longer than `number` letters.
+* `lessThan(number)` - Include only words shorter than `number` letters.
+* `include(words...)` - Extra words to include in the random calculation that aren't normally in the list.
+* `exclude(words...)` - Words in the list to leave out.
+
+The available transformations are:
+
+* `pluralize()` - Pluralize the chosen word.
+* `capitalize()` - Capitalize the chosen word.
+* `past()` - Conjugate the chosen word to the past tense. Note that this only makes sense for verbs, but there's nothing preventing you from doing this with any word. I.e. `{{ noun | past }}` wouldn't throw an error and could return something nonsensical like "gnomed" . . . which may or may not be okay (like if you're writing a [Ulysses](https://en.wikipedia.org/wiki/Ulysses_(novel))-esque novel).
+* `pastParticiple()` - Congjugate the chosen word to the past participle.
+* `conjugate(pronoun)` - Conjugate the chosen word based on the point of view (e.g. I run/you run/he runs).
+* `saveAs(key)` - Store the word generated to use again a later, e.g. `Fast {{ noun | saveAs("a") }} is the best {{ a }}`
+
+##### Custom filters
+
+Additionally, you can register your own filters. For example, if you wanted to reverse the chosen word (for some bizarre reason):
+
+```js
+whimsy.register('reverse', function(word) {
+  return word.split('').reverse().join('');
+});
+whimsy('{{ noun | reverse }}');
+```
+
+### 2. Via the whimsy API
+
 ### Browser
 
 ### Example

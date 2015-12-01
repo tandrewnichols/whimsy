@@ -18,7 +18,7 @@ At the moment, whimsy is fairly limited. The lists of nouns, verbs, adjective, a
 
 Whimsy replaces mustache style interpolation patterns with random words, e.g. `{{ noun }}` generates a random noun. Whimsy is not smart, however. It can't pick words that make sense given the context around them. It just picks random ones from the list. There are three ways to use whimsy:
 
-### 1. whimsy() as a function
+### 1. Via the exported function
 
 ##### With interpolation
 
@@ -92,6 +92,59 @@ whimsy('{{ noun | reverse }}');
 ```
 
 ### 2. Via the whimsy API
+
+##### Parts of speech
+
+In addition to calling whimsy directly, you have access to a few lower level APIs that are useful. Most notably, each part of speech is a function on the whimsy object, so you do the following:
+
+```js
+whimsy.noun();
+whimsy.pronoun();
+whimsy.pronoun('reflexive');
+```
+
+These will return you a single word of the part of speech you specify.
+
+##### .generate()
+
+`.generate` is the first function called by the part-of-speech functions, so you can call it directly if you want. The only required parameter to the `.generate` function is the part of speech, so calling it can be as simple as
+
+```js
+whimsy.generate('pronoun.reflexive');
+```
+
+But you can also generate multiple words:
+
+```js
+whimsy.generate('noun', { count: 2 }); // "count" is the only option at the moment
+```
+
+And apply filters to them:
+
+```js
+whimsy.generate('verb', [{ name: 'conjugate', params: ['he'] }]); // Not all filters require "params"
+
+// Note that the list of filters is not part of the options object. If you want to pass both, it looks like this
+whimsy.generate('noun', { count: 4 }, [{ name: 'capitalize' }]);
+```
+
+##### Internal API
+
+Additionally, all of the internal methods on whimsy are accessible, so you could do some things yourself if you wanted to. Something like:
+
+```js
+var list = ['a', 'list', 'of', 'random', 'word'];
+var word = whimsy.get(list); // Returns a random word from a list
+var processedWord = whimsy.applyFilters(word, [{ name: 'capitalize' }, { name: 'saveAs', params: ['foo'] }]); // Runs the word through the filters supplied
+```
+
+These are all undocumented methods as they're not really intended for direct consumption, but the enterprising developer who spends some time looking at the code and the tests might find some interesting uses for them.
+
+##### With filters
+
+You can also call these part-of-speech functions with options.
+
+### 3. Via the whimsy binary
 
 ### Browser
 

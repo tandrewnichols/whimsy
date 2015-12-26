@@ -103,7 +103,20 @@ whimsy.pronoun();
 whimsy.pronoun('reflexive');
 ```
 
-These will return you a single word of the part of speech you specify.
+These will return you a single word of the part of speech you specify, but you can generate multiple words by passing the `count` option:
+
+```js
+whimsy.noun({ count: 2 }); // Generates an array of 2 nouns
+whimsy.pronoun('reflexive', { count: 2 });
+```
+
+Furthermore, you can pass filters to these part-of-speech functions, as an array of objects, where each object has a `name` (the filter to apply) and optional `params` (arguments to apply to the filter function).
+
+```js
+whimsy.noun([{ name: 'capitalize' }]); // Generates a capitalized noun
+whimsy.noun({ count: 2 }, [{ name: 'capitalize' }]); // Generates two capitalized noun
+whimsy.noun([{ name: 'startsWith', params: ['a'] }, { name: 'capitalize' }]); // Generate a capitalized noun starting with "a"
+```
 
 ##### .generate()
 
@@ -113,18 +126,11 @@ These will return you a single word of the part of speech you specify.
 whimsy.generate('pronoun.reflexive');
 ```
 
-But you can also generate multiple words:
+Count and filters are the same as with individual parts of speech
 
 ```js
 whimsy.generate('noun', { count: 2 }); // "count" is the only option at the moment
-```
-
-And apply filters to them:
-
-```js
 whimsy.generate('verb', [{ name: 'conjugate', params: ['he'] }]); // Not all filters require "params"
-
-// Note that the list of filters is not part of the options object. If you want to pass both, it looks like this
 whimsy.generate('noun', { count: 4 }, [{ name: 'capitalize' }]);
 ```
 
@@ -140,15 +146,61 @@ var processedWord = whimsy.applyFilters(word, [{ name: 'capitalize' }, { name: '
 
 These are all undocumented methods as they're not really intended for direct consumption, but the enterprising developer who spends some time looking at the code and the tests might find some interesting uses for them.
 
-##### With filters
-
-You can also call these part-of-speech functions with options.
-
 ### 3. Via the whimsy binary
+
+If you install whimsy globally (`npm install -g whimsy`), you can also use it via the command line.
+
+##### whimsy
+
+The `whimsy` command by itself is similar to calling `whimsy` as a function:
+
+```bash
+>> whimsy "The {{ noun | pluralize }} were left {{ preposition }} the {{ noun }}"
+```
+
+As you can see, filters work exactly like the do in the `whimsy` function.
+
+##### parts of speech
+
+Whimsy also has subcommands for each part of speech, so you can do things like:
+
+```bash
+>> whimsy noun
+```
+
+and
+
+```bash
+>> whimsy pronoun personal
+```
+
+Additionally, you can pass a count via the `--count/-c` option and filters via the `--filter/-f` option.
+
+```bash
+>> whimsy verb -c 2 -f conjugate("he")
+```
+
+##### add
+
+Additionally, you can add new words to the whimsy dictionary via the `add` command. The syntax is `whimsy add type words...`.
+
+```bash
+>> whimsy add noun foo bar
+```
+
+Whimsy will not add duplicate words, so you don't have to worry about whether words are already in the dictionary.
+
+##### remove
+
+Conversely, you can remove words from the whimsy dictionary via the `remove` command. The syntax is `whimsy remove type words...`.
+
+```bash
+>> whimsy remove noun foo bar
+```
 
 ### Browser
 
-### Example
+Whimsy can be included in the browser by serving `dist/whimsy.js` or `dist/whimsy.min.js`. Then use `window.whimsy`.
 
 ## Contributing
 

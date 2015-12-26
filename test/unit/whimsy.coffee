@@ -96,8 +96,13 @@ describe 'whimsy', ->
         params: []
 
     context 'parens with a parameter', ->
-      context '- a simple string', ->
+      context '- a simple string with double quotes', ->
         Then -> @subject.parse('foo("bar")').should.eql
+          name: 'foo'
+          params: ['bar']
+
+      context '- a simple string with single quotes', ->
+        Then -> @subject.parse('foo(\'bar\')').should.eql
           name: 'foo'
           params: ['bar']
 

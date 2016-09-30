@@ -80,6 +80,6 @@
     "vinyl-source-stream": "^1.1.0"
   },
   "optionalDependencies": {
-    "wordnet-db": "^3.1.2"
+    "WNdb": "^3.1.1"
   }
 }
